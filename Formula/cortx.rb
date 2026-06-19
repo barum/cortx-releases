@@ -14,6 +14,17 @@ class Cortx < Formula
     end
   end
 
+  on_linux do
+    on_arm do
+      url "https://github.com/barum/cortx-releases/releases/download/v#{version}/cortx-#{version}-aarch64-unknown-linux-gnu.tar.gz"
+      sha256 "acdac59eadb4159dcfb079ee57505cc60cc352fd39faf888392cbc7d89376cf3"
+    end
+    on_intel do
+      url "https://github.com/barum/cortx-releases/releases/download/v#{version}/cortx-#{version}-x86_64-unknown-linux-gnu.tar.gz"
+      sha256 "26d9d857be98faf0a68d06b011a91acdac62b3a361c88cac9a9433353513120c"
+    end
+  end
+
   def install
     bin.install "cortx"
   end
