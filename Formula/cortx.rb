@@ -10,7 +10,7 @@ class Cortx < Formula
   on_macos do
     on_arm do
       url "https://github.com/barum/cortx-releases/releases/download/v6.13.0/cortx-6.13.0-aarch64-apple-darwin.tar.gz"
-      sha256 "000718f18c3ae0e748e412d759b1a7145db8f545561fb865425a523869eb3060"
+      sha256 "c02a2773beebb88127d5bef312f686240d3f03ba8cc1f4703e6308a1ceac5739"
     end
   end
 
