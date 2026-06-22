@@ -10,18 +10,18 @@ class Cortx < Formula
   on_macos do
     on_arm do
       url "https://github.com/barum/cortx-releases/releases/download/v6.13.0/cortx-6.13.0-aarch64-apple-darwin.tar.gz"
-      sha256 "b5d613a9c81165273ced0cfe42aa94dd22279f99837aee9b502114326bfba115"
+      sha256 "4bdb89e604916d3fc675eebf647a72c50b69881d17a8eb1bf67594892b4dd038"
     end
   end
 
   on_linux do
     on_arm do
       url "https://github.com/barum/cortx-releases/releases/download/v#{version}/cortx-#{version}-aarch64-unknown-linux-gnu.tar.gz"
-      sha256 "0771ff269282454b16d69b2feca9121797fd0218d8a3fbd885243da761cffe27"
+      sha256 "d461b0c3ab081d2d201eeb6d2a904958bae571d54144c3709e5f6a4d93946a05"
     end
     on_intel do
       url "https://github.com/barum/cortx-releases/releases/download/v#{version}/cortx-#{version}-x86_64-unknown-linux-gnu.tar.gz"
-      sha256 "a8c3975813dff888e8371bcd38b4fd8092554bbb78dd85239fb0ef3868acdeab"
+      sha256 "ef59d1d65fff6c58eabba2626e511174b0e1e983689f24281e849343db4564a5"
     end
   end
 
