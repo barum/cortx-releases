@@ -1,27 +1,37 @@
-# Homebrew formula for the single `cortx` binary (custom tap — CorTxOS is
-# proprietary, so not homebrew-core). Regenerated per release by CI; this seed
-# ships macOS arm64. Other targets are added when CI publishes them.
+# Homebrew formula for the single `cortx` binary.
+#
+# This lives in a CUSTOM TAP (e.g. `barum/homebrew-cortxos`), NOT homebrew-core:
+# CorTxOS is proprietary, and homebrew-core only accepts OSI-licensed, notable
+# software. Install with:
+#
+#     brew tap barum/cortxos https://github.com/barum/homebrew-cortxos
+#     brew install cortx
+#
+# The release workflow regenerates this file per tag, substituting the version
+# and the four per-target SHA-256 sums (the __SHA256_*__ tokens below).
 class Cortx < Formula
   desc "CorTxOS single-binary agentic skill runtime (run/dispatch/audit/memory/mcp/gateway)"
   homepage "https://cortxos.dev"
-  version "6.13.0"
+  version "6.14.0"
   license :cannot_represent # proprietary; see LICENSE in the release tarball
 
   on_macos do
+    # Apple Silicon only. x86_64-apple-darwin (Intel Mac) is not published while
+    # GitHub's macos-13 runners are deprecated; Intel-Mac users build from source.
     on_arm do
-      url "https://github.com/barum/cortx-releases/releases/download/v6.13.0/cortx-6.13.0-aarch64-apple-darwin.tar.gz"
-      sha256 "4bdb89e604916d3fc675eebf647a72c50b69881d17a8eb1bf67594892b4dd038"
+      url "https://github.com/barum/cortx-releases/releases/download/v#{version}/cortx-#{version}-aarch64-apple-darwin.tar.gz"
+      sha256 "790d0266ee052a934614f9d54d033539290fa5c95f62794f57ffd49e4e854e87"
     end
   end
 
   on_linux do
     on_arm do
       url "https://github.com/barum/cortx-releases/releases/download/v#{version}/cortx-#{version}-aarch64-unknown-linux-gnu.tar.gz"
-      sha256 "d461b0c3ab081d2d201eeb6d2a904958bae571d54144c3709e5f6a4d93946a05"
+      sha256 "bc4ad39b0d11a809aae0aacdac8941466b05457bcebd5ffa47c3e9280765ddd4"
     end
     on_intel do
       url "https://github.com/barum/cortx-releases/releases/download/v#{version}/cortx-#{version}-x86_64-unknown-linux-gnu.tar.gz"
-      sha256 "ef59d1d65fff6c58eabba2626e511174b0e1e983689f24281e849343db4564a5"
+      sha256 "53c559aca1d4f27b419408a5636fe9faba7c203b3a58d4bb4b9f695bc3c1a88d"
     end
   end
 
@@ -30,7 +40,8 @@ class Cortx < Formula
   end
 
   # Durable long-term-memory daemon. `brew services start cortx` wires this to
-  # launchd; the graph persists at ~/.cortx/memory/graph.grafeo across restarts.
+  # launchd (macOS) or systemd --user (Linuxbrew). The graph persists at
+  # ~/.cortx/memory/graph.grafeo across restarts.
   service do
     run [opt_bin/"cortx", "graph-server"]
     keep_alive true
