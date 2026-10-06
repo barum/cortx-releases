@@ -1,0 +1,307 @@
+# CorTxOS Installation Manual
+
+CorTxOS ships as **one binary, `cortx`** (crate `cortx-runtime`), version **6.16.0**.
+The binary **embeds** all 88 skills + shared references
+(ADR-0152), so it runs standalone with no checked-out tree.
+
+There are two distinct install surfaces — pick by what you need:
+
+| You want… | Install surface | Script |
+|-----------|-----------------|--------|
+| The `cortx` CLI / MCP server on PATH | The **binary** | [`scripts/install-cortx.sh`](../../scripts/install-cortx.sh) · [`scripts/install-cortx.ps1`](../../scripts/install-cortx.ps1) · Homebrew · Scoop · .deb/.rpm (winget: not currently supported, see [§5](#5-winget-windows--not-currently-a-supported-channel)) |
+| The skills tree laid out under `~/.claude` for Claude-Code-native discovery | The **skills tree** | [`install.sh`](../../install.sh) · `npx @cortxos/install` |
+
+The binary does **not** require the skills tree — it embeds it. Install the tree
+only when you want Claude Code to discover the skills as native `/`-commands and
+SKILL.md files outside the MCP path.
+
+Distribution is from the **public** repo
+[`barum/cortx-releases`](https://github.com/barum/cortx-releases) (the source repo
+`barum/my-skills` is private). `cortx self-update` defaults there.
+
+## Platform / method matrix
+
+| Method | Linux | macOS | Windows | Installs |
+|--------|:-----:|:-----:|:-------:|----------|
+| `curl \| bash` ([install-cortx.sh](#1-curl--bash-macos--linux)) | ✅ | ✅ | — | binary |
+| PowerShell ([install-cortx.ps1](#2-powershell-windows)) | — | — | ✅ (x86_64) | binary |
+| [Homebrew](#3-homebrew-macos--linuxbrew) | ✅ | ✅ | — | binary |
+| [Scoop](#4-scoop-windows) | — | — | ✅ | binary |
+| [winget](#5-winget-windows--not-currently-a-supported-channel) | — | — | ⛔ not shipped | binary |
+| [.deb / .rpm](#6-debian--ubuntu-deb-and-fedora--rhel-rpm) | ✅ | — | — | binary |
+| [npm `npx @cortxos/install`](#7-npm-skills-tree-for-claude-code) | ✅ | ✅ | ⚠️ needs bash+tar | skills tree |
+| [`install.sh`](#8-skills-tree-installsh) | ✅ | ✅ | ⚠️ needs bash | skills tree |
+| [From source](#9-build-from-source) | ✅ | ✅ | ✅ | binary |
+
+Published binary targets (four): `aarch64-apple-darwin`, `x86_64-unknown-linux-gnu`,
+`aarch64-unknown-linux-gnu`, `x86_64-pc-windows-msvc`. `x86_64-apple-darwin` (Intel
+Mac) is **not published** — GitHub's macos-13 runners are deprecated and now queue
+indefinitely, so that leg was dropped from the release matrix (see
+[`docs/release-notes/2026-07-02-drop-intel-mac-target.md`](../release-notes/2026-07-02-drop-intel-mac-target.md)).
+Intel-Mac users should use [§9 Build from source](#9-build-from-source).
+
+## Binary install channels
+
+### 1. curl | bash (macOS + Linux)
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/barum/cortx-releases/main/scripts/install-cortx.sh | bash
+```
+
+What it does (see [`scripts/install-cortx.sh`](../../scripts/install-cortx.sh)):
+
+1. Detects OS/arch via `uname` and maps to a target triple (`apple-darwin` /
+   `unknown-linux-gnu`; `x86_64` / `aarch64`).
+2. Resolves the latest release tag from the GitHub API (or uses `CORTX_VERSION`).
+3. Downloads `cortx-<ver>-<triple>.tar.gz` **and** its `.sha256` sidecar.
+4. **Verifies the SHA-256** (`sha256sum` or `shasum -a 256`); aborts on mismatch.
+5. Extracts `cortx` and installs it to `/usr/local/bin` if writable, else
+   `~/.local/bin`.
+
+Environment overrides:
+
+```sh
+CORTX_VERSION=6.16.0 \
+CORTX_REPO=barum/cortx-releases \
+CORTX_BIN_DIR="$HOME/.local/bin" \
+  bash -c 'curl -fsSL https://raw.githubusercontent.com/barum/cortx-releases/main/scripts/install-cortx.sh | bash'
+```
+
+If the chosen bin dir is not on `PATH`, the script prints the `export PATH=…`
+line to add.
+
+### 2. PowerShell (Windows)
+
+```powershell
+irm https://raw.githubusercontent.com/barum/cortx-releases/main/scripts/install-cortx.ps1 | iex
+```
+
+What it does (see [`scripts/install-cortx.ps1`](../../scripts/install-cortx.ps1)):
+
+1. Requires **x86_64** Windows (the only published Windows target) — fails loudly
+   otherwise.
+2. Resolves the latest release (or `-Version`).
+3. Downloads `cortx-<ver>-x86_64-pc-windows-msvc.zip` + `.sha256`, **verifies the
+   hash** with `Get-FileHash`.
+4. Extracts `cortx.exe` to `%LOCALAPPDATA%\Programs\cortx` and adds it to the
+   **user** `PATH` (restart your shell to pick it up).
+
+Pin a version:
+
+```powershell
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/barum/cortx-releases/main/scripts/install-cortx.ps1))) -Version 6.16.0
+```
+
+### 3. Homebrew (macOS + Linuxbrew)
+
+CorTxOS is proprietary, so it lives in a **custom tap**, not homebrew-core:
+
+```sh
+brew tap barum/cortx-releases https://github.com/barum/cortx-releases
+brew install barum/cortx-releases/cortx
+brew services start cortx   # optional: durable long-term-memory daemon (cortx graph-server)
+```
+
+The formula (`Formula/cortx.rb` in the tap) carries real per-target checksums,
+regenerated by the release workflow.
+
+### 4. Scoop (Windows)
+
+```powershell
+scoop bucket add cortx-releases https://github.com/barum/cortx-releases
+scoop install cortx
+```
+
+Manifest: `bucket/cortx.json` in the public repo.
+
+### 5. winget (Windows) — **not currently a supported channel**
+
+**`winget install Monarizations.CorTxOS` does not work today.** A winget
+manifest set (package id `Monarizations.CorTxOS`) is generated per release and
+attached as `winget-manifests.tar.gz`, but a directory of manifest files is not
+a winget *source* — `winget install` only resolves from `microsoft/winget-pkgs`
+or a REST source added with `winget source add`, and neither has been set up.
+Submitting to `microsoft/winget-pkgs` requires a public, reviewable package and
+ongoing manifest maintenance that this proprietary-binary distribution does not
+currently take on, so winget is unshipped: use [§2 PowerShell](#2-powershell-windows)
+or [§4 Scoop](#4-scoop-windows) instead. See
+[`packaging/README.md`](../../packaging/README.md#winget-not-currently-supported)
+for the full decision record.
+
+### 6. Debian / Ubuntu (.deb) and Fedora / RHEL (.rpm)
+
+Download the package for your arch from the
+[release assets](https://github.com/barum/cortx-releases/releases) and install:
+
+```sh
+sudo apt install ./cortx_6.16.0_amd64.deb      # or: sudo dpkg -i ./cortx_6.16.0_amd64.deb
+sudo dnf install ./cortx-6.16.0.x86_64.rpm     # or: sudo rpm -i ./cortx-6.16.0.x86_64.rpm
+systemctl --user enable --now cortx-graph-server   # optional durable memory (user unit)
+```
+
+The memory daemon ships as a **user** systemd unit (writes under `$HOME`); the
+package never enables a system-wide service.
+
+## Skills-tree install channels
+
+These lay out the skill catalog for Claude Code; they do **not** install the
+`cortx` binary.
+
+### 7. npm (skills tree for Claude Code)
+
+```bash
+npx @cortxos/install                          # install into $PWD (--project mode)
+npx @cortxos/install --target /path           # custom target
+npx @cortxos/install --ref v6.16.0            # pin a release tag (default: main)
+npx @cortxos/install --checksum <sha256>      # verify the tarball SHA-256 (recommended)
+npx @cortxos/install --with-experimental      # include the experimental skills
+```
+
+Under the hood (see [`npm/bin/cortx-install.js`](../../npm/bin/cortx-install.js)):
+downloads the source tarball from `barum/my-skills` (allowlist-gated; non-canonical
+repos require `--unsafe-allow-arbitrary-repo`), optionally SHA-256-verifies it,
+extracts with hardened `tar` flags, and runs `install.sh --project $PWD`. Requires
+**Node 18+**, `bash`, and `tar` on PATH.
+
+### 8. Skills tree (`install.sh`)
+
+Run from a checkout of `barum/my-skills` (see [`install.sh`](../../install.sh)):
+
+```sh
+bash install.sh --project /path/to/your/repo        # → <repo>/.claude/skills/cortxos/
+bash install.sh --global                            # → ~/.cortxos/
+bash install.sh --target /opt/cortxos               # → custom path
+bash install.sh --dry-run --project /path/to/repo   # preview, write nothing
+```
+
+Useful flags:
+
+| Flag | Effect |
+|------|--------|
+| `--with-experimental` | also install the 19 experimental skills (off by default) |
+| `--without-meta` | skip the 5 meta-tier skills (installed by default) |
+| `--lite` | install the 8-skill Lite bundle, skip the runtime build |
+| `--claude-native` | add flat-layout symlinks so Claude Code discovers skills natively (requires `--project`) |
+| `--with-hooks` | symlink `pre-commit.sh` into the target repo's `.git/hooks/` |
+| `--verify` | verify file counts after install |
+| `--git` | stage + commit + push after install |
+| `--uninstall` | remove the installation |
+
+The version is read from the repo `VERSION` file (single source of truth). When
+`cargo` is on PATH, `install.sh` also builds `cortx-runtime` and places it under
+`<install>/scripts/cortx-runtime`.
+
+### 9. Build from source
+
+Requires the pinned Rust toolchain (**1.91**, per `rust-toolchain.toml`):
+
+```sh
+git clone https://github.com/barum/my-skills.git
+cd my-skills
+cargo build --manifest-path runtime/Cargo.toml -p cortx-runtime --release
+# binary at runtime/target/release/cortx-runtime — install it as `cortx`:
+install -m 0755 runtime/target/release/cortx-runtime "$HOME/.local/bin/cortx"
+```
+
+Cross-compiling to other targets under the pinned channel may lack `std` locally;
+use the release CI matrix for multi-platform builds.
+
+## MCP host wiring
+
+`cortx mcp` is the MCP server (stdio JSON-RPC 2.0; add `--http <addr>` for HTTP).
+It exposes the 88 embedded skills as `cortx_skill_<name>` tools. Wire it into a
+host's config (read-merge-write, preserving existing servers):
+
+```sh
+cortx install mcp claude-code            # project .mcp.json (or ~/.claude.json with --global)
+cortx install mcp claude-code --global   # user scope
+```
+
+Supported hosts (13): `antigravity`, `claude` (Desktop), `claude-code`, `cline`,
+`codex` (TOML), `cursor`, `gemini`, `goose` (YAML), `kiro`, `visual-studio`,
+`vscode`, `windsurf`, `zed`.
+
+For Claude Code you can also use the native CLI:
+
+```sh
+claude mcp add cortx -- cortx mcp
+```
+
+## Durable memory daemon
+
+Long-term memory is the `cortx graph-server` daemon (GrafeoDB, durable by default;
+graph at `~/.cortx/memory/graph.grafeo`):
+
+```sh
+cortx graph-server          # keep running (foreground), or run under your service manager
+cortx memory health         # verify clients can reach the socket
+```
+
+Service-manager options: `brew services start cortx` (macOS),
+`systemctl --user enable --now cortx-graph-server` (Linux packages).
+
+## Self-update
+
+An installed binary updates itself from the signed public releases:
+
+```sh
+cortx self-update            # check only — prints whether a newer version exists
+cortx self-update --apply    # download + verify SHA-256 + swap the running binary
+```
+
+It downloads the raw `cortx-runtime-<triple>` asset matching the host triple and
+verifies its `.sha256` sidecar before replacing the executable. Defaults to
+`barum/cortx-releases`.
+
+## Verifying signatures & checksums
+
+Every release asset has a `.sha256` sidecar, and the release also publishes an
+aggregate `SHA256SUMS`. The install scripts verify automatically; to verify a
+manual download:
+
+```sh
+# Linux / macOS — single asset
+curl -fsSLO https://github.com/barum/cortx-releases/releases/download/v6.16.0/cortx-6.16.0-x86_64-unknown-linux-gnu.tar.gz
+curl -fsSLO https://github.com/barum/cortx-releases/releases/download/v6.16.0/cortx-6.16.0-x86_64-unknown-linux-gnu.tar.gz.sha256
+sha256sum -c cortx-6.16.0-x86_64-unknown-linux-gnu.tar.gz.sha256   # GNU; on macOS: shasum -a 256 -c
+```
+
+```powershell
+# Windows
+(Get-FileHash -Algorithm SHA256 .\cortx-6.16.0-x86_64-pc-windows-msvc.zip).Hash
+# compare against the .sha256 sidecar contents
+```
+
+The skills-tree `install.sh` additionally verifies a detached signature of
+`plugin.json` when a `.claude-plugin/plugin.json.sig` sidecar is present
+(tamper-evident; a present-but-invalid sidecar is a hard stop).
+
+## Uninstall
+
+```sh
+# Binary (curl/PowerShell installs) — remove from the bin dir it was placed in:
+rm -f /usr/local/bin/cortx ~/.local/bin/cortx          # macOS/Linux
+# Windows: delete %LOCALAPPDATA%\Programs\cortx and remove it from your user PATH
+
+# Homebrew
+brew uninstall cortx && brew untap barum/cortx-releases
+
+# Scoop
+scoop uninstall cortx
+
+# .deb / .rpm
+sudo apt remove cortx        # or: sudo dnf remove cortx
+
+# Skills tree (install.sh)
+bash install.sh --uninstall --project /path/to/your/repo
+```
+
+Stop the durable-memory daemon first if it is running
+(`brew services stop cortx`, `systemctl --user disable --now cortx-graph-server`,
+or terminate the foreground `cortx graph-server`).
+
+## Related docs
+
+- [packaging/README.md](../../packaging/README.md) — what a release produces and how it is cut.
+- [deployment.md](deployment.md) — running CorTxOS services in a cluster.
+- [security.md](security.md) — supply-chain and signing posture.

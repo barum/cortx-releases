@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CorTxOS — Skill Index</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 24px; color: #222; background: #fafafa; }
+    h1 { margin: 0 0 4px; font-size: 28px; }
+    .subtitle { color: #666; margin-bottom: 24px; }
+    .filters { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
+    .filters input, .filters select { padding: 8px 12px; font-size: 14px; border: 1px solid #ccc; border-radius: 6px; background: #fff; }
+    .filters input { flex: 1; min-width: 200px; }
+    .counts { color: #666; font-size: 13px; }
+    table { width: 100%; border-collapse: collapse; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.06); border-radius: 6px; overflow: hidden; }
+    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #eee; vertical-align: top; }
+    th { background: #f5f5f5; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em; color: #555; cursor: pointer; user-select: none; }
+    th:hover { background: #eee; }
+    tr.row:hover { background: #f9f9f9; cursor: pointer; }
+    tr.detail { display: none; background: #f8f9fa; }
+    tr.detail.open { display: table-row; }
+    tr.detail td { padding: 16px 24px; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+    .badge.stable { background: #e3f2fd; color: #0d47a1; }
+    .badge.experimental { background: #fff3e0; color: #e65100; }
+    .badge.meta { background: #f3e5f5; color: #4a148c; }
+    .tool-chip { display: inline-block; margin: 2px 3px 2px 0; padding: 1px 7px; font-size: 11px; background: #eef; color: #336; border-radius: 3px; border: 1px solid #dde; font-family: monospace; }
+    .detail-grid { display: grid; grid-template-columns: 140px 1fr; gap: 8px 16px; align-items: baseline; }
+    .detail-grid dt { font-weight: 600; color: #555; font-size: 12px; text-transform: uppercase; }
+    .detail-grid dd { margin: 0; }
+    .dag-section { margin-top: 32px; background: #fff; padding: 16px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .dag-section h2 { margin-top: 0; }
+    .mermaid { font: 12px monospace; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; background: #f0f0f0; padding: 1px 5px; border-radius: 3px; }
+    .desc { color: #333; max-width: 600px; }
+  </style>
+</head>
+<body>
+  <h1>CorTxOS — Skill Index</h1>
+  <div class="subtitle">88 skills — 64 stable, 19 experimental, 5 meta</div>
+
+  <div class="filters">
+    <input id="q" type="search" placeholder="Filter by name or description..." autofocus>
+    <select id="stability">
+      <option value="">All tiers</option>
+      <option value="stable">Stable</option>
+      <option value="experimental">Experimental</option>
+      <option value="meta">Meta</option>
+    </select>
+    <select id="model">
+      <option value="">All models</option>
+      <option value="opus">opus</option>
+      <option value="sonnet">sonnet</option>
+      <option value="haiku">haiku</option>
+    </select>
+    <span class="counts" id="counts"></span>
+  </div>
+
+  <table id="tbl">
+    <thead>
+      <tr>
+        <th data-sort="name">Skill</th>
+        <th data-sort="stability">Tier</th>
+        <th data-sort="model">Model</th>
+        <th>Description</th>
+        <th data-sort="consumes_from">Consumes</th>
+      </tr>
+    </thead>
+    <tbody id="body"></tbody>
+  </table>
+
+  <div class="dag-section">
+    <h2>consumes_from DAG</h2>
+    <div class="mermaid">flowchart LR
+  classDef stable fill:#e3f2fd,stroke:#1976d2,color:#0d47a1
+  classDef experimental fill:#fff3e0,stroke:#f57c00,color:#e65100
+  classDef meta fill:#f3e5f5,stroke:#7b1fa2,color:#4a148c
+  a11y-remediator:::stable
+  agent-behavior-vetter:::stable
+  agent-budget-governor:::stable
+  agentic-architect:::stable
+  architecture-cache:::stable
+  authority-chain-enforcer:::stable
+  autonomous-incident-responder:::stable
+  brownfield-onboarder:::stable
+  build-integrity:::stable
+  change-propagator:::stable
+  coding-standards:::stable
+  cognitive-load-analyzer:::stable
+  compliance-evidence-manager:::stable
+  component-library-steward:::stable
+  cortx-brain:::stable
+  cortx-orchestrator:::stable
+  cost-estimator:::stable
+  database-architect:::stable
+  dependency-updater:::stable
+  deprecation-manager:::stable
+  design-system-curator:::stable
+  devops-architect:::stable
+  doc-reality-checker:::stable
+  drift-monitor:::stable
+  enforcement-orchestrator:::stable
+  epic-developer:::stable
+  epic-implementer:::stable
+  error-corpus:::stable
+  escalation-coordinator:::stable
+  ethics-enforcer:::stable
+  agent-cascade-resolver:::experimental
+  agent-spec-auditor:::experimental
+  architecture-variant-generator:::experimental
+  chaos-engineer:::experimental
+  counterfactual-tracker:::experimental
+  emergent-capability-detector:::experimental
+  energy-accountant:::experimental
+  hypothesis-generator:::experimental
+  immune-memory:::experimental
+  intent-verifier:::experimental
+  knowledge-thermodynamics-gc:::experimental
+  physics-budgeter:::experimental
+  provenance-grapher:::experimental
+  sentinel-compiler:::experimental
+  spec-archaeologist:::experimental
+  spec-bisect:::experimental
+  spec-oracle:::experimental
+  spec-review-scheduler:::experimental
+  treaty-negotiator:::experimental
+  feature-flag-curator:::stable
+  feedback-loop-auditor:::stable
+  fitness-monitor:::stable
+  frontend-architect:::stable
+  ideator:::stable
+  incident-commander:::stable
+  incident-pattern-analyzer:::stable
+  lifecycle-manager:::stable
+  load-test-architect:::stable
+  migration-planner:::stable
+  observability-architect:::stable
+  plan-tournament:::stable
+  pr-review-coordinator:::stable
+  principal-engineer:::stable
+  privacy-dpia-reviewer:::stable
+  product-manager:::stable
+  red-team-orchestrator:::stable
+  release-notes-curator:::stable
+  retrospective-facilitator:::stable
+  sbom-and-supply-chain-manager:::stable
+  secrets-vault-manager:::stable
+  security-reviewer:::stable
+  semantic-differ:::stable
+  skill-evolver:::stable
+  skill-improver:::stable
+  spec-developer:::stable
+  spec-federator:::stable
+  story-creator:::stable
+  technical-writer:::stable
+  technology-radar:::stable
+  temporal-analyzer:::stable
+  testing-strategist:::stable
+  threat-model-architect:::stable
+  vulnerability-and-cve-coordinator:::stable
+  cortx-auditor:::meta
+  reference-loader:::meta
+  skill-author:::meta
+  spec-synthesizer:::meta
+  version-lifecycle-manager:::meta
+  frontend-architect --> a11y-remediator
+  testing-strategist --> a11y-remediator
+  epic-implementer --> a11y-remediator
+  autonomous-incident-responder --> agent-behavior-vetter
+  cortx-orchestrator --> agent-behavior-vetter
+  agentic-architect --> agent-budget-governor
+  autonomous-incident-responder --> agent-budget-governor
+  fitness-monitor --> agent-budget-governor
+  observability-architect --> agent-budget-governor
+  principal-engineer --> agentic-architect
+  principal-engineer --> architecture-cache
+  brownfield-onboarder --> architecture-cache
+  spec-developer --> authority-chain-enforcer
+  agentic-architect --> autonomous-incident-responder
+  observability-architect --> autonomous-incident-responder
+  user --> brownfield-onboarder
+  epic-implementer --> build-integrity
+  every-skill --> change-propagator
+  principal-engineer --> coding-standards
+  epic-implementer --> coding-standards
+  spec-developer --> cognitive-load-analyzer
+  principal-engineer --> cognitive-load-analyzer
+  epic-developer --> cognitive-load-analyzer
+  security-reviewer --> compliance-evidence-manager
+  devops-architect --> compliance-evidence-manager
+  observability-architect --> compliance-evidence-manager
+  sentinel-compiler --> compliance-evidence-manager
+  frontend-architect --> component-library-steward
+  epic-implementer --> component-library-steward
+  testing-strategist --> component-library-steward
+  every-skill --> cortx-brain
+  user --> cortx-orchestrator
+  cortx-brain --> cortx-orchestrator
+  story-creator --> cortx-orchestrator
+  brownfield-onboarder --> cortx-orchestrator
+  epic-developer --> cost-estimator
+  principal-engineer --> cost-estimator
+  principal-engineer --> database-architect
+  spec-developer --> database-architect
+  devops-architect --> dependency-updater
+  migration-planner --> deprecation-manager
+  semantic-differ --> deprecation-manager
+  observability-architect --> deprecation-manager
+  frontend-architect --> design-system-curator
+  spec-developer --> devops-architect
+  principal-engineer --> devops-architect
+  epic-implementer --> devops-architect
+  migration-planner --> devops-architect
+  technical-writer --> doc-reality-checker
+  epic-implementer --> doc-reality-checker
+  spec-developer --> doc-reality-checker
+  spec-developer --> drift-monitor
+  epic-implementer --> drift-monitor
+  brownfield-onboarder --> drift-monitor
+  sentinel-compiler --> enforcement-orchestrator
+  ethics-enforcer --> enforcement-orchestrator
+  immune-memory --> enforcement-orchestrator
+  devops-architect --> enforcement-orchestrator
+  product-manager --> epic-developer
+  ideator --> epic-developer
+  brownfield-onboarder --> epic-developer
+  spec-developer --> epic-implementer
+  principal-engineer --> epic-implementer
+  agentic-architect --> epic-implementer
+  story-creator --> epic-implementer
+  epic-developer --> epic-implementer
+  frontend-architect --> epic-implementer
+  testing-strategist --> epic-implementer
+  brownfield-onboarder --> epic-implementer
+  every-skill --> error-corpus
+  autonomous-incident-responder --> error-corpus
+  agent-behavior-vetter --> error-corpus
+  agent-behavior-vetter --> escalation-coordinator
+  autonomous-incident-responder --> escalation-coordinator
+  agentic-architect --> escalation-coordinator
+  authority-chain-enforcer --> escalation-coordinator
+  spec-developer --> ethics-enforcer
+  treaty-negotiator --> ethics-enforcer
+  autonomous-incident-responder --> agent-cascade-resolver
+  agentic-architect --> agent-cascade-resolver
+  observability-architect --> agent-cascade-resolver
+  autonomous-incident-responder --> agent-spec-auditor
+  agentic-architect --> agent-spec-auditor
+  error-corpus --> agent-spec-auditor
+  drift-monitor --> agent-spec-auditor
+  principal-engineer --> architecture-variant-generator
+  architecture-cache --> architecture-variant-generator
+  spec-developer --> chaos-engineer
+  hypothesis-generator --> chaos-engineer
+  plan-tournament --> counterfactual-tracker
+  principal-engineer --> counterfactual-tracker
+  cortx-brain --> emergent-capability-detector
+  fitness-monitor --> emergent-capability-detector
+  spec-developer --> energy-accountant
+  physics-budgeter --> energy-accountant
+  spec-developer --> hypothesis-generator
+  principal-engineer --> hypothesis-generator
+  error-corpus --> hypothesis-generator
+  spec-developer --> immune-memory
+  red-team-orchestrator --> immune-memory
+  security-reviewer --> immune-memory
+  chaos-engineer --> immune-memory
+  spec-developer --> intent-verifier
+  epic-implementer --> intent-verifier
+  cortx-brain --> knowledge-thermodynamics-gc
+  error-corpus --> knowledge-thermodynamics-gc
+  architecture-cache --> knowledge-thermodynamics-gc
+  spec-developer --> physics-budgeter
+  observability-architect --> physics-budgeter
+  spec-developer --> provenance-grapher
+  red-team-orchestrator --> provenance-grapher
+  plan-tournament --> provenance-grapher
+  spec-developer --> sentinel-compiler
+  ethics-enforcer --> sentinel-compiler
+  energy-accountant --> sentinel-compiler
+  physics-budgeter --> sentinel-compiler
+  immune-memory --> sentinel-compiler
+  user --> spec-archaeologist
+  spec-developer --> spec-bisect
+  drift-monitor --> spec-bisect
+  spec-developer --> spec-oracle
+  spec-federator --> spec-oracle
+  cortx-brain --> spec-oracle
+  provenance-grapher --> spec-oracle
+  hypothesis-generator --> spec-oracle
+  temporal-analyzer --> spec-review-scheduler
+  lifecycle-manager --> spec-review-scheduler
+  spec-developer --> treaty-negotiator
+  spec-federator --> treaty-negotiator
+  devops-architect --> feature-flag-curator
+  observability-architect --> feature-flag-curator
+  incident-commander --> feedback-loop-auditor
+  fitness-monitor --> feedback-loop-auditor
+  error-corpus --> feedback-loop-auditor
+  cortx-orchestrator --> fitness-monitor
+  cortx-brain --> fitness-monitor
+  emergent-capability-detector --> fitness-monitor
+  principal-engineer --> frontend-architect
+  user --> ideator
+  brownfield-onboarder --> ideator
+  observability-architect --> incident-commander
+  devops-architect --> incident-commander
+  chaos-engineer --> incident-commander
+  drift-monitor --> incident-commander
+  intent-verifier --> incident-commander
+  incident-commander --> incident-pattern-analyzer
+  error-corpus --> incident-pattern-analyzer
+  fitness-monitor --> incident-pattern-analyzer
+  spec-developer --> lifecycle-manager
+  fitness-monitor --> lifecycle-manager
+  temporal-analyzer --> lifecycle-manager
+  principal-engineer --> load-test-architect
+  spec-developer --> load-test-architect
+  testing-strategist --> load-test-architect
+  observability-architect --> load-test-architect
+  principal-engineer --> migration-planner
+  spec-developer --> observability-architect
+  agentic-architect --> observability-architect
+  devops-architect --> observability-architect
+  principal-engineer --> observability-architect
+  epic-developer --> observability-architect
+  frontend-architect --> observability-architect
+  principal-engineer --> plan-tournament
+  cortx-brain --> plan-tournament
+  coding-standards --> pr-review-coordinator
+  security-reviewer --> pr-review-coordinator
+  testing-strategist --> pr-review-coordinator
+  epic-developer --> principal-engineer
+  story-creator --> principal-engineer
+  testing-strategist --> principal-engineer
+  brownfield-onboarder --> principal-engineer
+  security-reviewer --> privacy-dpia-reviewer
+  principal-engineer --> privacy-dpia-reviewer
+  epic-developer --> privacy-dpia-reviewer
+  ideator --> product-manager
+  user --> product-manager
+  brownfield-onboarder --> product-manager
+  spec-developer --> red-team-orchestrator
+  hypothesis-generator --> red-team-orchestrator
+  semantic-differ --> release-notes-curator
+  technical-writer --> release-notes-curator
+  epic-developer --> release-notes-curator
+  deprecation-manager --> release-notes-curator
+  cortx-orchestrator --> retrospective-facilitator
+  lifecycle-manager --> retrospective-facilitator
+  dependency-updater --> sbom-and-supply-chain-manager
+  devops-architect --> sbom-and-supply-chain-manager
+  security-reviewer --> sbom-and-supply-chain-manager
+  security-reviewer --> secrets-vault-manager
+  devops-architect --> secrets-vault-manager
+  principal-engineer --> security-reviewer
+  agentic-architect --> security-reviewer
+  story-creator --> security-reviewer
+  epic-developer --> security-reviewer
+  user --> security-reviewer
+  red-team-orchestrator --> security-reviewer
+  authority-chain-enforcer --> security-reviewer
+  dependency-updater --> security-reviewer
+  spec-developer --> semantic-differ
+  skill-improver --> skill-evolver
+  fitness-monitor --> skill-evolver
+  retrospective-facilitator --> skill-evolver
+  cortx-brain --> skill-evolver
+  agent-behavior-vetter --> skill-evolver
+  error-corpus --> skill-evolver
+  emergent-capability-detector --> skill-evolver
+  hypothesis-generator --> skill-evolver
+  epic-implementer --> skill-improver
+  incident-commander --> skill-improver
+  every-skill --> skill-improver
+  cortx-orchestrator --> skill-improver
+  emergent-capability-detector --> skill-improver
+  principal-engineer --> spec-developer
+  agentic-architect --> spec-developer
+  story-creator --> spec-developer
+  architecture-cache --> spec-developer
+  spec-archaeologist --> spec-developer
+  brownfield-onboarder --> spec-developer
+  plan-tournament --> spec-developer
+  spec-developer --> spec-federator
+  cortx-brain --> spec-federator
+  epic-developer --> story-creator
+  brownfield-onboarder --> story-creator
+  spec-developer --> technical-writer
+  principal-engineer --> technical-writer
+  epic-implementer --> technical-writer
+  devops-architect --> technical-writer
+  observability-architect --> technical-writer
+  frontend-architect --> technical-writer
+  semantic-differ --> technical-writer
+  devops-architect --> technology-radar
+  coding-standards --> technology-radar
+  dependency-updater --> technology-radar
+  spec-developer --> temporal-analyzer
+  technology-radar --> temporal-analyzer
+  spec-developer --> testing-strategist
+  principal-engineer --> testing-strategist
+  story-creator --> testing-strategist
+  epic-developer --> testing-strategist
+  frontend-architect --> testing-strategist
+  epic-developer --> threat-model-architect
+  principal-engineer --> threat-model-architect
+  dependency-updater --> vulnerability-and-cve-coordinator
+  security-reviewer --> vulnerability-and-cve-coordinator
+  devops-architect --> vulnerability-and-cve-coordinator
+  user --> cortx-auditor
+  cortx-orchestrator --> reference-loader
+  user --> skill-author
+  user --> spec-synthesizer
+  cortx-auditor --> version-lifecycle-manager
+  semantic-differ --> version-lifecycle-manager
+  change-propagator --> version-lifecycle-manager</div>
+  </div>
+
+  <div hidden id="skill-anchors"><span data-skill-name="a11y-remediator"></span>
+<span data-skill-name="agent-behavior-vetter"></span>
+<span data-skill-name="agent-budget-governor"></span>
+<span data-skill-name="agentic-architect"></span>
+<span data-skill-name="architecture-cache"></span>
+<span data-skill-name="authority-chain-enforcer"></span>
+<span data-skill-name="autonomous-incident-responder"></span>
+<span data-skill-name="brownfield-onboarder"></span>
+<span data-skill-name="build-integrity"></span>
+<span data-skill-name="change-propagator"></span>
+<span data-skill-name="coding-standards"></span>
+<span data-skill-name="cognitive-load-analyzer"></span>
+<span data-skill-name="compliance-evidence-manager"></span>
+<span data-skill-name="component-library-steward"></span>
+<span data-skill-name="cortx-brain"></span>
+<span data-skill-name="cortx-orchestrator"></span>
+<span data-skill-name="cost-estimator"></span>
+<span data-skill-name="database-architect"></span>
+<span data-skill-name="dependency-updater"></span>
+<span data-skill-name="deprecation-manager"></span>
+<span data-skill-name="design-system-curator"></span>
+<span data-skill-name="devops-architect"></span>
+<span data-skill-name="doc-reality-checker"></span>
+<span data-skill-name="drift-monitor"></span>
+<span data-skill-name="enforcement-orchestrator"></span>
+<span data-skill-name="epic-developer"></span>
+<span data-skill-name="epic-implementer"></span>
+<span data-skill-name="error-corpus"></span>
+<span data-skill-name="escalation-coordinator"></span>
+<span data-skill-name="ethics-enforcer"></span>
+<span data-skill-name="agent-cascade-resolver"></span>
+<span data-skill-name="agent-spec-auditor"></span>
+<span data-skill-name="architecture-variant-generator"></span>
+<span data-skill-name="chaos-engineer"></span>
+<span data-skill-name="counterfactual-tracker"></span>
+<span data-skill-name="emergent-capability-detector"></span>
+<span data-skill-name="energy-accountant"></span>
+<span data-skill-name="hypothesis-generator"></span>
+<span data-skill-name="immune-memory"></span>
+<span data-skill-name="intent-verifier"></span>
+<span data-skill-name="knowledge-thermodynamics-gc"></span>
+<span data-skill-name="physics-budgeter"></span>
+<span data-skill-name="provenance-grapher"></span>
+<span data-skill-name="sentinel-compiler"></span>
+<span data-skill-name="spec-archaeologist"></span>
+<span data-skill-name="spec-bisect"></span>
+<span data-skill-name="spec-oracle"></span>
+<span data-skill-name="spec-review-scheduler"></span>
+<span data-skill-name="treaty-negotiator"></span>
+<span data-skill-name="feature-flag-curator"></span>
+<span data-skill-name="feedback-loop-auditor"></span>
+<span data-skill-name="fitness-monitor"></span>
+<span data-skill-name="frontend-architect"></span>
+<span data-skill-name="ideator"></span>
+<span data-skill-name="incident-commander"></span>
+<span data-skill-name="incident-pattern-analyzer"></span>
+<span data-skill-name="lifecycle-manager"></span>
+<span data-skill-name="load-test-architect"></span>
+<span data-skill-name="migration-planner"></span>
+<span data-skill-name="observability-architect"></span>
+<span data-skill-name="plan-tournament"></span>
+<span data-skill-name="pr-review-coordinator"></span>
+<span data-skill-name="principal-engineer"></span>
+<span data-skill-name="privacy-dpia-reviewer"></span>
+<span data-skill-name="product-manager"></span>
+<span data-skill-name="red-team-orchestrator"></span>
+<span data-skill-name="release-notes-curator"></span>
+<span data-skill-name="retrospective-facilitator"></span>
+<span data-skill-name="sbom-and-supply-chain-manager"></span>
+<span data-skill-name="secrets-vault-manager"></span>
+<span data-skill-name="security-reviewer"></span>
+<span data-skill-name="semantic-differ"></span>
+<span data-skill-name="skill-evolver"></span>
+<span data-skill-name="skill-improver"></span>
+<span data-skill-name="spec-developer"></span>
+<span data-skill-name="spec-federator"></span>
+<span data-skill-name="story-creator"></span>
+<span data-skill-name="technical-writer"></span>
+<span data-skill-name="technology-radar"></span>
+<span data-skill-name="temporal-analyzer"></span>
+<span data-skill-name="testing-strategist"></span>
+<span data-skill-name="threat-model-architect"></span>
+<span data-skill-name="vulnerability-and-cve-coordinator"></span>
+<span data-skill-name="cortx-auditor"></span>
+<span data-skill-name="reference-loader"></span>
+<span data-skill-name="skill-author"></span>
+<span data-skill-name="spec-synthesizer"></span>
+<span data-skill-name="version-lifecycle-manager"></span></div>
+
+  <script type="application/json" id="data">[{"name":"a11y-remediator","description":"Use when you need to fix (not just find) accessibility problems — \"remediate the a11y violations\", \"make this WCAG 2.1 AA compliant\", \"fix the accessibility issues in this component\", \"generate an a11y remediation plan\", \"add an accessibility pre-commit gate\", \"wire up eslint-plugin-jsx-a11y / axe-core in CI\", \"audit and repair the keyboard navigation\", \"raise this to WCAG AAA\", \"why is axe-core failing on this page\". Specialized accessibility skill that audits designs and code against WCAG 2.1 AA/AAA, produces ranked remediation plans, emits concrete code/design fixes, and installs the pre-commit + review gating (eslint-plugin-jsx-a11y, axe-core) that frontend-architect §F6 and testing-strategist only identify but never repair.","version":"5","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob","Bash"],"uses_tools":[],"consumes_from":["frontend-architect","testing-strategist","epic-implementer"],"produces_for":[],"estimated_tokens":"3000-7000","path":"skills/cortx-core/a11y-remediator/SKILL.md"},{"name":"agent-behavior-vetter","description":"Gatekeeper skill that approves or rejects candidate agent behaviors before promotion from runtime-learned to pre-approved-action-set. Invoked when any runtime agent writes a new candidate pattern to docs/products/<product>/agent-patterns/candidates/. Runs formal-spec compliance check, safety analysis, counterfactual analysis, budget impact; decides approve/reject/escalate-to-human. Approved candidates become PRs against the agent's spec; rejected candidates archived with rationale into error-corpus as \"attempted-but-rejected\". Triggers include: \"vet this agent pattern\", \"is this agent behavior safe\", new candidate file detection, scheduled weekly review of pending candidates.","version":"7","stability":"stable","model":"opus","tools":["Read","Write","Edit","Grep","Glob"],"uses_tools":["ask_user_input_v0","visualize:show_widget"],"consumes_from":["autonomous-incident-responder","cortx-orchestrator"],"produces_for":["error-corpus","escalation-coordinator","skill-evolver"],"estimated_tokens":"3000-6000","path":"skills/cortx-core/agent-behavior-vetter/SKILL.md"},{"name":"agent-budget-governor","description":"Use when monitoring or ENFORCING runtime-agent budget consumption (action-rate, cloud-cost, error-budget) at product AND ecosystem level across deployed CorTxOS agents. Triggers include \"are the agents over budget\", \"halt the runaway agent\", \"enforce the budget envelopes\", \"which agent is burning cost\", \"is the fleet within its action-rate budget\", \"check ecosystem agent spend\", \"product-budget exhausted — what do I cut\", or automatically when fitness-monitor reports a budget metric crossing a threshold. Reads agentic-architect's declared envelopes and observability-architect's runtime telemetry, then halts cost-incurring/high-impact agents on product-budget exhaustion and escalates trend-toward-exhaustion. Respects autonomy-boundaries.md tiers + the per-capability kill switch.","version":"5","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob","Bash"],"uses_tools":[],"consumes_from":["agentic-architect","autonomous-incident-responder","fitness-monitor","observability-architect"],"produces_for":["cortx-brain"],"estimated_tokens":"3000-6000","path":"skills/cortx-core/agent-budget-governor/SKILL.md"},{"name":"agentic-architect","description":"Design-time skill that maps epic/story requirements to runtime agent specifications. Triggered after principal-engineer completes §3 Component Architecture. Expands each non-passive component into a full agent spec; action catalog, decision logic, boundary policies, provenance log schema, budget envelopes, learned-behavior pathway. Produces Agent-Runtime Spec that spec-developer consumes as layer 8. Triggers include: \"design the agents\", \"specify runtime autonomy\", \"what agents does this system need\", \"turn reactive/proactive classifications into agent specs\".","version":"6","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob"],"uses_tools":["ask_user_input_v0","visualize:show_widget"],"consumes_from":["principal-engineer"],"produces_for":["agent-budget-governor","agent-cascade-resolver","agent-spec-auditor","autonomous-incident-responder","epic-implementer","escalation-coordinator","observability-architect","security-reviewer","spec-developer"],"estimated_tokens":"5000-12000","path":"skills/cortx-core/agentic-architect/SKILL.md"},{"name":"architecture-cache","description":"Use to read or write persistent architectural decisions, data models, API contracts, and component interfaces that span multiple epics. Every principal-engineer invocation reads this cache; every design output appends to it. Triggers include any design activity, \"what did we decide about X\", \"how is Y currently designed\", or when the orchestrator dispatches principal-engineer. This is the product's architectural memory.","version":"9","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob"],"uses_tools":[],"consumes_from":["principal-engineer","brownfield-onboarder"],"produces_for":["architecture-variant-generator","knowledge-thermodynamics-gc","spec-developer"],"estimated_tokens":"1000-3000","path":"skills/cortx-core/architecture-cache/SKILL.md"},{"name":"authority-chain-enforcer","description":"Enforces explicit authority chains over spec sections — who owns what, how many approvers required, what checklists must pass, emergency override paths. Prevents security team's specs from being modified by a frontend engineer without authorization. The spec for who can change the spec. Triggered by \"who can modify this spec?\", \"authorize spec change\", \"authority check\", or on every spec commit.","version":"7","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob"],"uses_tools":[],"consumes_from":["spec-developer"],"produces_for":["escalation-coordinator","security-reviewer"],"estimated_tokens":"3000-8000","path":"skills/cortx-core/authority-chain-enforcer/SKILL.md"},{"name":"autonomous-incident-responder","description":"The runtime incident-responder agent SPEC — a reusable agent archetype that epic-implementer instantiates into generated Rust code for any product needing autonomous SEV-1/2/3 mitigation. This skill is the authoritative specification of the responder's decision loop, action catalog, policy enforcement, and kill-switch semantics. Invoked at design-time by agentic-architect to populate each product's incident-responder agent spec. Triggers include: \"design the incident responder\", \"spec the runtime mitigation agent\", \"what can autonomously respond to SEV-1\", \"how does the on-call agent behave\".","version":"6","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob"],"uses_tools":["ask_user_input_v0","visualize:show_widget"],"consumes_from":["agentic-architect","observability-architect"],"produces_for":["agent-behavior-vetter","agent-budget-governor","agent-cascade-resolver","agent-spec-auditor","error-corpus","escalation-coordinator"],"estimated_tokens":"4000-8000","path":"skills/cortx-core/autonomous-incident-responder/SKILL.md"},{"name":"brownfield-onboarder","description":"Use once per existing product when adopting CorTxOS onto a repo that has code, existing documentation, or both. Performs inventory, classification, recovery from code, mapping of existing docs into CorTxOS artifact shapes, reconciliation between code and docs, and gap surfacing. Populates cortx-brain's 4 knowledge layers plus the standard epic/story/design/spec artifacts with `recovered: true` and `confidence: HIGH|MED|LOW` tags. Produces a brownfield-report.md with a prioritized go-forward checklist the user must work through before `cortx-orchestrator` runs any new work. Triggers include \"onboard this repo to CorTxOS\", \"adopt CorTxOS onto <product>\", \"brownfield bootstrap\", \"archaeology on this existing codebase\", \"we have existing docs — ingest them\", or the first invocation of `cortx-orchestrator` on a repo that has code but no `cortx-brain` layer files. Runs at Stage −1 (before ideator).","version":"7","stability":"stable","model":"opus","tools":["Read","Write","Edit","Grep","Glob","Bash","WebSearch"],"uses_tools":["web_search","ask_user_input_v0","present_files","bash_tool","conversation_search"],"consumes_from":["user"],"produces_for":["cortx-brain","architecture-cache","cortx-orchestrator","drift-monitor","epic-developer","epic-implementer","ideator","principal-engineer","product-manager","spec-developer","story-creator"],"estimated_tokens":"10000-40000","path":"skills/cortx-core/brownfield-onboarder/SKILL.md"},{"name":"build-integrity","description":"Cross-cutting grounding gate that enforces production-grade delivery on every build. Invoked BY other skills (epic-implementer during build, principal-engineer during design, pr-review-coordinator during review) and directly. Triggers include \"is this production-ready\", \"definition of done\", \"verify/validate/confirm the build\", \"are there stubs/placeholders/TODOs\", \"is this tested\", \"is the API documented in OpenAPI\", \"no fluff / no stubs\", or any go/no-go ship decision. It asserts the build is VERIFIED (compiles/builds clean + lints), VALIDATED (real tests exist and pass), and CONFIRMED (acceptance criteria met); that there are ZERO stubs, placeholders, TODOs, or dead code; that the code is real, high-quality, and well-commented; and that every API surface ships a valid OpenAPI document that matches the code. It does NOT design (principal-engineer), choose the test strategy (testing-strategist), or write code (epic-implementer) — it is the binary go/no-go gate that grounds them.","version":"2","stability":"stable","model":"opus","tools":["Read","Grep","Glob","Bash"],"uses_tools":[],"consumes_from":["epic-implementer"],"produces_for":[],"estimated_tokens":"2500-5000","path":"skills/cortx-core/build-integrity/SKILL.md"},{"name":"change-propagator","description":"The immune system of the skill-OS pipeline. When ANY artifact changes (code, design, schema, config, API), this skill automatically detects what else needs updating and cascades the change through tests, docs, deployment configs, monitoring, databases, and memory. Triggers on EVERY commit, design update, schema migration, config change, or API modification. Also triggers when user says \"propagate this change\", \"what else needs updating\", \"cascade this\", or \"sync everything\".","version":"7","stability":"stable","model":"opus","tools":["Read","Write","Edit","Grep","Glob","Bash"],"uses_tools":["bash_tool"],"consumes_from":["every-skill"],"produces_for":["every-skill","cortx-brain","version-lifecycle-manager"],"estimated_tokens":"2000-5000","path":"skills/cortx-core/change-propagator/SKILL.md"},{"name":"coding-standards","description":"Use whenever code is being written, reviewed, designed, or discussed in any product. Triggers include writing new code, reviewing a diff, designing a component in principal-engineer, enforcing conventions in epic-implementer, or any mention of \"lint\", \"format\", \"coding conventions\", \"code quality\", \"style guide\", or language-specific patterns. This skill is a cross-cutting lens — it is invoked BY other skills (principal-engineer, epic-implementer) and during code review, and can also be invoked directly for standalone code tasks.","version":"11","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob"],"uses_tools":[],"consumes_from":["principal-engineer","epic-implementer"],"produces_for":["pr-review-coordinator","technology-radar"],"estimated_tokens":"2000-4000","path":"skills/cortx-core/coding-standards/SKILL.md"},{"name":"cognitive-load-analyzer","description":"Scores specifications and designs for human reviewability. Measures reading time, context switches, terminology density, cross-reference count, and diagram complexity. Flags artifacts above threshold and suggests concrete refactorings. Triggered by \"is this too complex\", \"check cognitive load\", \"score readability\", or automatically on every spec/design artifact.","version":"6","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob"],"uses_tools":["visualize:show_widget"],"consumes_from":["spec-developer","principal-engineer","epic-developer"],"produces_for":[],"estimated_tokens":"3000-8000","path":"skills/cortx-core/cognitive-load-analyzer/SKILL.md"},{"name":"compliance-evidence-manager","description":"Use when you need to collect, structure, and publish per-control audit evidence for a compliance framework — \"build the FedRAMP evidence packet\", \"assemble the SOC 2 Type II audit binder\", \"where is the evidence for AC-2\", \"map our controls to CMMC L3\", \"GDPR Article 32 evidence\", \"ITAR §120.10 evidence\", \"generate the certification-readiness report\", \"what's our audit gap list\", or when security-reviewer emits findings that must be tied back to control evidence. Produces per-control evidence packets (control text, requirement, located evidence in code/config/log/test, pass/gap/mitigated status), audit checklists, and certification-readiness reports across FedRAMP High, CMMC L3, SOC 2 Type II, GDPR, and ITAR.","version":"5","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob","Bash"],"uses_tools":["conversation_search"],"consumes_from":["security-reviewer","devops-architect","observability-architect","sentinel-compiler"],"produces_for":["user"],"estimated_tokens":"3000-6000","path":"skills/cortx-core/compliance-evidence-manager/SKILL.md"},{"name":"component-library-steward","description":"Use when the UI component library needs to be owned as a versioned product — generating Storybook stories, asserting axe-core accessibility per story, autogenerating component docs from TypeScript types, versioning component APIs, capturing visual-regression baselines, and detecting component breaking changes. Triggers include \"generate the Storybook stories\", \"set up the component library\", \"add axe assertions to every story\", \"version the component API\", \"capture visual-regression baselines\", \"did this component break its public API\", \"publish the design-system package\", or when epic-implementer commits UI components that frontend-architect §F11 said require stories. Targets the CorTxOS frontend stack (TypeScript + React + MUI + Solid.js + Bun + Storybook + Chromatic/Percy + axe-core + Lighthouse CI).","version":"5","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob","Bash"],"uses_tools":[],"consumes_from":["frontend-architect","epic-implementer","testing-strategist"],"produces_for":[],"estimated_tokens":"4000-8000","path":"skills/cortx-core/component-library-steward/SKILL.md"},{"name":"cortx-brain","description":"The nervous system of the skill-OS pipeline. Manages a unified knowledge layer spanning Claude memory (cross-conversation persistence), architecture cache (design decisions), domain model (product knowledge), and operational history (metrics, patterns). EVERY skill reads from cortx-brain before starting and writes back after completing. Triggers on ANY pipeline activity — it is always active. Also triggers on \"what do we know about X\", \"sync the brain\", \"update memory\", \"what patterns have we seen\", or \"what's the state of product Y\".","version":"7","stability":"stable","model":"opus","tools":["Read","Edit","Grep","Glob"],"uses_tools":["memory_user_edits","conversation_search","recent_chats","visualize:show_widget"],"consumes_from":["every-skill"],"produces_for":["every-skill"],"estimated_tokens":"1500-4000","path":"skills/cortx-core/cortx-brain/SKILL.md"},{"name":"cortx-orchestrator","description":"The master conductor of the skill-OS pipeline. Self-evolving, memory-integrated, predictive orchestrator. Selects pipeline templates, parallelizes work, enforces contracts, manages context budget, persists state, auto-updates memory/docs/deployments/databases after every change, runs fitness checks, triggers skill evolution, and learns from every run. This is not a tool — it is an operating system for building software. Triggers on ANY multi-stage request, \"build this\", \"run the pipeline\", \"continue\", \"what's the state of\", or when the user starts a conversation about a product.","version":"11","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob"],"uses_tools":["memory_user_edits","conversation_search","recent_chats","ask_user_input_v0","visualize:show_widget"],"consumes_from":["user","cortx-brain","story-creator","brownfield-onboarder"],"produces_for":["user","cortx-brain","agent-behavior-vetter","fitness-monitor","reference-loader","retrospective-facilitator","skill-improver"],"estimated_tokens":"2000-6000","path":"skills/cortx-core/cortx-orchestrator/SKILL.md"},{"name":"cost-estimator","description":"Use to estimate engineering effort, infrastructure cost, and operational cost before committing to an epic. Transforms product-manager's \"Effort S/M/L/XL\" into grounded estimates. Triggers include \"how much will this cost\", \"estimate the effort\", \"infrastructure cost\", \"TCO analysis\", \"budget this\", or when the orchestrator runs the Platform or Greenfield template.","version":"8","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob","WebSearch","WebFetch"],"uses_tools":["web_search","web_fetch","visualize:show_widget"],"consumes_from":["epic-developer","principal-engineer"],"produces_for":[],"estimated_tokens":"1500-3000","path":"skills/cortx-core/cost-estimator/SKILL.md"},{"name":"database-architect","description":"Use when validating the RATIONALE behind a data model — indexing strategy, partitioning/sharding, normalization vs denormalization trade-offs, cardinality estimates, access-pattern alignment, and hot-path query plans. Triggers include \"review the schema\", \"is this index right\", \"should we partition this table\", \"normalize or denormalize\", \"estimate the cardinality\", \"will this query scan the whole table\", \"model the data for this feature\", or when principal-engineer §6 (Data Model) or spec-developer's data layer needs a design-time datastore review. Targets the CorTxOS datastore set (PostgreSQL transactional + RocksDB embedded KV + Valkey cache + ClickHouse analytics) resolved from the active stack profile.","version":"6","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob","Bash"],"uses_tools":[],"consumes_from":["principal-engineer","spec-developer"],"produces_for":[],"estimated_tokens":"3000-6000","path":"skills/cortx-core/database-architect/SKILL.md"},{"name":"dependency-updater","description":"Use to manage automated dependency updates across the monorepo. Runs vulnerability scans, generates update PRs, verifies no breaking changes, and feeds security-reviewer findings into the backlog. Triggers include \"update dependencies\", \"check for vulnerabilities\", \"dependency audit\", \"renovate\", or weekly scheduled runs.","version":"9","stability":"stable","model":"opus","tools":["Read","Write","Edit","Grep","Glob","Bash","WebSearch","WebFetch"],"uses_tools":["web_search","web_fetch","bash_tool"],"consumes_from":["devops-architect"],"produces_for":["sbom-and-supply-chain-manager","security-reviewer","technology-radar","vulnerability-and-cve-coordinator"],"estimated_tokens":"1500-3000","path":"skills/cortx-core/dependency-updater/SKILL.md"},{"name":"deprecation-manager","description":"Use when an API, endpoint, wire field, feature flag, or whole service is being retired and someone must run the operational sunset — track who still calls the deprecated surface, notify dependent consumers, schedule the retirement, and orchestrate the final cutoff. Triggers include \"deprecate this API\", \"sunset this endpoint\", \"who still uses X\", \"build the deprecation timeline\", \"notify dependent consumers\", \"plan the retirement\", \"track deprecated usage\", \"when can we delete this\", or when migration-planner's breaking-change window opens and the operational sunset workflow must run alongside it.","version":"5","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob"],"uses_tools":[],"consumes_from":["migration-planner","semantic-differ","observability-architect"],"produces_for":["release-notes-curator"],"estimated_tokens":"2000-5000","path":"skills/cortx-core/deprecation-manager/SKILL.md"},{"name":"design-system-curator","description":"Use when curating the design-system / token lifecycle — defining design tokens, versioning them with semver, syncing Figma↔code (export, generate, round-trip), running token-change approval workflows, distributing tokens cross-repo, or propagating a token change to consumers. Triggers include \"version the design tokens\", \"sync Figma to code\", \"generate the token pipeline\", \"publish the design system\", \"approve this token change\", \"bump the token package\", \"set up Style Dictionary\", \"distribute tokens to the apps\", or when frontend-architect §F5 has declared what tokens should be and they now need a versioned, distributable source of truth.","version":"5","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob","Bash"],"uses_tools":[],"consumes_from":["frontend-architect"],"produces_for":[],"estimated_tokens":"3000-7000","path":"skills/cortx-core/design-system-curator/SKILL.md"},{"name":"devops-architect","description":"Use when designing or implementing CI/CD pipelines, infrastructure-as-code, deployment strategies, container configurations, charts, or release automation. Triggers include \"set up CI/CD\", \"design the deployment\", \"write the Dockerfile\", \"how do we deploy this\", \"create the Terraform\", \"build the pipeline\", or when epic-implementer produces code that needs a deployment path. Targets the CorTxOS deployment stack (GitHub Actions + Docker distroless + Helm + ArgoCD + Argo Rollouts + Terraform on GCP/GKE + Vault + Trivy + cosign, with PQC enforcement).","version":"12","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob","Bash","WebSearch","WebFetch"],"uses_tools":["web_search","web_fetch"],"consumes_from":["spec-developer","principal-engineer","epic-implementer","migration-planner"],"produces_for":["compliance-evidence-manager","dependency-updater","enforcement-orchestrator","feature-flag-curator","incident-commander","observability-architect","sbom-and-supply-chain-manager","secrets-vault-manager","technical-writer","technology-radar","vulnerability-and-cve-coordinator"],"estimated_tokens":"4000-8000","path":"skills/cortx-core/devops-architect/SKILL.md"},{"name":"doc-reality-checker","description":"Use when validating that technical-writer documentation matches live code — checking that API examples compile and run, detecting function/signature mismatches between docs and source, and executing runbook procedures to catch documentation drift. Triggers include \"check the docs against the code\", \"do the API examples still compile\", \"validate the runbook\", \"is this documentation accurate\", \"verify the README commands\", \"did the signatures change\", \"reality-check the docs\", or after technical-writer emits an artifact that has never been validated against the system it describes. Closes the documentation feedback loop that technical-writer leaves open by producing for the user with no verification of output-vs-reality.","version":"6","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob","Bash"],"uses_tools":[],"consumes_from":["technical-writer","epic-implementer","spec-developer"],"produces_for":[],"estimated_tokens":"3000-7000","path":"skills/cortx-core/doc-reality-checker/SKILL.md"},{"name":"drift-monitor","description":"Continuously detects divergence between code and specs. Runs as a periodic background scan (every 5 min or on-demand). Produces drift findings with severity classification, auto-creates tickets, and can trigger auto-revert for CRITICAL drift if configured. Triggered by \"check for drift\", \"run drift scan\", \"is my code in sync with the spec\", or automatically as a daemon.","version":"6","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob","WebSearch"],"uses_tools":["web_search"],"consumes_from":["spec-developer","epic-implementer","brownfield-onboarder"],"produces_for":["agent-spec-auditor","incident-commander","spec-bisect"],"estimated_tokens":"3000-8000","path":"skills/cortx-core/drift-monitor/SKILL.md"},{"name":"enforcement-orchestrator","description":"Use when compiled multi-layer enforcement code (sentinels) exists and must be deployed into a running stack. Triggers include \"deploy the sentinels\", \"orchestrate enforcement deployment\", \"roll out the compiled invariants\", \"wire sentinel-compiler output into ArgoCD\", \"ship the OPA/RLS/Envoy/Cilium guards\", \"confirm enforcement coverage in production\", or when sentinel-compiler has emitted a sentinels/ bundle that has no deployment path. Takes sentinel-compiler's compiled OPA Rego, PostgreSQL RLS + triggers, Prometheus/Alertmanager rules, Envoy HTTP filters, Cilium CiliumNetworkPolicies, and ML-DSA-87-signed audit specs and orchestrates their deployment through devops-architect's GitOps surface (ArgoCD/Helm/Argo Rollouts on GKE), producing a deployment manifest plus a coverage-confirmation report. Closes the verified enforcement dead-end (sentinel-compiler produces_for:[]).","version":"5","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob","Bash"],"uses_tools":[],"consumes_from":["sentinel-compiler","ethics-enforcer","immune-memory","devops-architect"],"produces_for":[],"estimated_tokens":"4000-9000","path":"skills/cortx-core/enforcement-orchestrator/SKILL.md"},{"name":"epic-developer","description":"Use when the user has a rough idea, one-liner, or high-level concept for a feature/product and asks to \"flesh out the epic\", \"research this idea\", \"turn this into an epic\", \"what would this entail\", \"expand this before we write stories\", \"build out this concept\", or \"scope this out\". Also trigger when user provides a backlog item and says \"let's dig into this one\" or \"research epic-NNNNN\". Produces a researched, deeply-scoped epic definition ready to feed into story-creator for story decomposition and principal-engineer for technical design. This skill does NOT write Gherkin stories and does NOT produce implementation designs — it produces the research layer between \"idea\" and \"stories\".","version":"11","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob","WebSearch"],"uses_tools":["web_search","ask_user_input_v0","visualize:show_widget","present_files"],"consumes_from":["product-manager","ideator","brownfield-onboarder"],"produces_for":["cognitive-load-analyzer","cost-estimator","epic-implementer","observability-architect","principal-engineer","privacy-dpia-reviewer","release-notes-curator","security-reviewer","story-creator","testing-strategist","threat-model-architect"],"estimated_tokens":"4000-8000","path":"skills/cortx-core/epic-developer/SKILL.md"},{"name":"epic-implementer","description":"Use when the full upstream chain exists — epic research + Gherkin stories + technical design + machine-verifiable specs — and the user wants to BUILD the system. Code is generated FROM the specs (wire, API, data, behavioral, security, observability, contract), with the design as intent context and stories as acceptance verification. Self-healing — when a story fails, the implementer classifies the failure (design bug / standards gap / environment issue / spec violation), routes the fix to the right skill, and retries once before logging. Targets the CorTxOS stack (Rust + Go + TypeScript via cargo/buf/bun, PostgreSQL, NATS, PQC). Triggers include \"implement all the epics\", \"build out the product\", \"execute the implementation plan\", \"keep building until every story is done\".","version":"14","stability":"stable","model":"opus","tools":["Read","Write","Edit","Grep","Glob","Bash","WebSearch"],"uses_tools":["bash_tool","web_search"],"consumes_from":["spec-developer","principal-engineer","agentic-architect","story-creator","epic-developer","frontend-architect","testing-strategist","brownfield-onboarder"],"produces_for":["a11y-remediator","build-integrity","coding-standards","component-library-steward","devops-architect","doc-reality-checker","drift-monitor","intent-verifier","skill-improver","technical-writer"],"estimated_tokens":"5000-15000","path":"skills/cortx-core/epic-implementer/SKILL.md"},{"name":"error-corpus","description":"The institutional failure memory of the skill ecosystem. Records every failure with its root cause, causal chain, prevention rule, and recurrence tracking. Every skill reads the corpus before executing to check for known failure patterns. Every failure writes back to it. Triggers on ANY pipeline failure, and before EVERY skill invocation (read mode). Also triggers on \"what mistakes have we made\", \"why did this fail before\", \"show me the error history\", \"what should I watch out for\".","version":"7","stability":"stable","model":"opus","tools":["Read","Edit","Grep","Glob"],"uses_tools":["memory_user_edits"],"consumes_from":["every-skill","autonomous-incident-responder","agent-behavior-vetter"],"produces_for":["every-skill","cortx-brain","agent-spec-auditor","feedback-loop-auditor","hypothesis-generator","incident-pattern-analyzer","knowledge-thermodynamics-gc","skill-evolver"],"estimated_tokens":"500-2000","path":"skills/cortx-core/error-corpus/SKILL.md"},{"name":"escalation-coordinator","description":"Use when human-in-the-loop approval flows need a single owner — \"queue this T3 approval\", \"page on-call for this escalation\", \"track approval SLA\", \"the vetter escalated a T4 candidate\", \"the responder hit its tier ceiling\", \"re-enable the kill switch\", \"who approves this autonomy action\", \"escalation backlog\", or when agent-behavior-vetter / autonomous-incident-responder / authority-chain-enforcer emit an approval that needs an SLA, a route, and a re-page on breach. Central HITL orchestrator that unifies the scattered approval gates into one queue with explicit SLAs, latency tracking, tier+category routing, auto-escalation on breach, and kill-switch re-enable authorization.","version":"5","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob"],"uses_tools":[],"consumes_from":["agent-behavior-vetter","autonomous-incident-responder","agentic-architect","authority-chain-enforcer"],"produces_for":["cortx-brain"],"estimated_tokens":"3000-6000","path":"skills/cortx-core/escalation-coordinator/SKILL.md"},{"name":"ethics-enforcer","description":"Defines ETHICS-NNN invariants as runtime-enforced constraints (not aspirational PDFs). Measures wellbeing proxies, user autonomy, interpretability, non-compound-inequality, informed-revocable-consent. Compiles to circuit breakers that fire when metrics cross ethical thresholds. Triggered by \"add ethics invariant\", \"ethics review\", \"enforce ETHICS-NNN\", or automatically during spec-developer Phase 5.","version":"8","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob","WebSearch"],"uses_tools":["web_search"],"consumes_from":["spec-developer","treaty-negotiator"],"produces_for":["enforcement-orchestrator","sentinel-compiler"],"estimated_tokens":"5000-12000","path":"skills/cortx-core/ethics-enforcer/SKILL.md"},{"name":"agent-cascade-resolver","description":"Use when MULTIPLE runtime agents on the same product are failing in a way that compounds — \"two agents are fighting over the same service\", \"the autoscaler and the responder are thrashing the same deployment\", \"one agent's mitigation broke another agent\", \"we have a cascade\", \"agents are racing on a product-scoped resource\", \"lock race between agents\", \"should we roll back, halt both, or escalate\", \"stop the cascade\". Detects and resolves CASCADING failures across runtime agents — mutual exclusion on product-scoped resources, backoff/retry on lock races, and the rollback-vs-halt-both-vs-escalate decision when one agent's action harms another. autonomous-incident-responder defines single-agent coordination but no cascade-stopping arbiter; this skill is that arbiter.","version":"2","stability":"experimental","model":"opus","tools":["Read","Write","Grep","Glob"],"uses_tools":[],"consumes_from":["autonomous-incident-responder","agentic-architect","observability-architect"],"produces_for":[],"estimated_tokens":"3000-7000","path":"skills/cortx-core/experimental/agent-cascade-resolver/SKILL.md"},{"name":"agent-spec-auditor","description":"Use when you need to audit DEPLOYED agent specs against the current CLAUDE.md, autonomy-boundaries.md, and error-corpus to find stale action-catalogs or drifted tier-ceilings. Triggers include \"audit the deployed agent specs\", \"are our agent specs stale\", \"do the responder's actions still match autonomy-boundaries\", \"check tier-ceiling drift\", \"which agents are failing because their spec is out of date\", \"run the periodic agent-spec audit\", or a scheduled weekly sweep. Correlates spec staleness with runtime agent-failure rate and routes drifted specs to spec-developer for refresh.","version":"2","stability":"experimental","model":"opus","tools":["Read","Write","Grep","Glob"],"uses_tools":[],"consumes_from":["autonomous-incident-responder","agentic-architect","error-corpus","drift-monitor"],"produces_for":[],"estimated_tokens":"3000-7000","path":"skills/cortx-core/experimental/agent-spec-auditor/SKILL.md"},{"name":"architecture-variant-generator","description":"Use when principal-engineer has emitted exactly one design and plan-tournament needs ≥2 contestants to rank — auto-generates ≥3 DISTINCT architectural alternatives within the declared architectural-invariants. Triggers include \"generate design variants\", \"give me architecture alternatives\", \"tournament needs more than one plan\", \"diversify this design\", \"explore N architectures\", or when cortx-orchestrator runs tournament mode (--explore=N) but only one design exists upstream.","version":"2","stability":"experimental","model":"opus","tools":["Read","Write","Grep","Glob"],"uses_tools":[],"consumes_from":["principal-engineer","architecture-cache"],"produces_for":[],"estimated_tokens":"3000-7000","path":"skills/cortx-core/experimental/architecture-variant-generator/SKILL.md"},{"name":"chaos-engineer","description":"Injects controlled chaos into spec SIMULATION before code is written — network partitions, clock skew, dependency failures, malicious type injection. Finds architectural flaws when they're still cheap to fix (in the spec, not production). Triggered by \"chaos test this spec\", \"inject failures\", \"what breaks under partition\", or automatically during spec-developer Phase 4.","version":"4","stability":"experimental","model":"opus","tools":["Read","Write","Grep","Glob"],"uses_tools":[],"consumes_from":["spec-developer","hypothesis-generator"],"produces_for":["immune-memory","incident-commander"],"estimated_tokens":"5000-15000","path":"skills/cortx-core/experimental/chaos-engineer/SKILL.md"},{"name":"counterfactual-tracker","description":"Preserves rejected alternatives from plan-tournament and other decision points as shadow branches. Periodically reevaluates whether the rejected alternative has become superior. Enables graceful migration when an alternative pulls ahead. Triggered by \"what if we had chosen X\", \"reevaluate alternatives\", \"show decision history\", or automatically quarterly.","version":"4","stability":"experimental","model":"opus","tools":["Read","Write","Grep","Glob","WebSearch"],"uses_tools":["web_search","conversation_search"],"consumes_from":["plan-tournament","principal-engineer"],"produces_for":["cortx-brain"],"estimated_tokens":"3000-10000","path":"skills/cortx-core/experimental/counterfactual-tracker/SKILL.md"},{"name":"emergent-capability-detector","description":"Detects skill sequences the ecosystem is successfully exhibiting that no SKILL.md declares. Invoke periodically (e.g., weekly) or after a batch of new metrics lands. Builds the declared graph from all SKILL.md frontmatter, the observed graph from metrics.jsonl, and reports the delta — edges that appeared in ≥3 runs at ≥80% success rate yet are not in any skill's consumes_from / produces_for / may_invoke. Routes HIGH-confidence emergent edges to skill-evolver for formalization; MED to skill-improver. Operates via the Rust `cortx emergent-edges` detector (cortx-emergent crate).","version":"4","stability":"experimental","model":"opus","tools":["Read","Write","Bash","Grep","Glob"],"uses_tools":["bash_tool"],"consumes_from":["cortx-brain","fitness-monitor"],"produces_for":["fitness-monitor","skill-evolver","skill-improver"],"estimated_tokens":"4000-10000","path":"skills/cortx-core/experimental/emergent-capability-detector/SKILL.md"},{"name":"energy-accountant","description":"Tracks energy budgets per operation, source mix (renewable percent), time-of-day shifting, and carbon intensity. Rejects inefficient implementations at spec compliance gate. Enables carbon-aware and carbon-proportional computing. Triggered by \"energy budget for this op\", \"carbon review\", \"is this efficient enough\", or automatically during epic-implementer's spec compliance phase.","version":"4","stability":"experimental","model":"opus","tools":["Read","Write","Grep","Glob","WebSearch"],"uses_tools":["web_search"],"consumes_from":["spec-developer","physics-budgeter"],"produces_for":["sentinel-compiler"],"estimated_tokens":"3000-8000","path":"skills/cortx-core/experimental/energy-accountant/SKILL.md"},{"name":"hypothesis-generator","description":"Use during spec-developer Phase 2–3 or principal-engineer's review window, before any downstream adversarial skill (red-team-orchestrator, chaos-engineer). Generates ≥15 falsifiable failure hypotheses for a fresh spec/design, dedupes against error-corpus, scores by Impact × Likelihood × Novelty, and routes the top 10 to the appropriate downstream skill for falsification. Refuses to run against empty or sub-100-token specs.","version":"3","stability":"experimental","model":"opus","tools":["Read","Write","Grep","Glob"],"uses_tools":[],"consumes_from":["spec-developer","principal-engineer","error-corpus"],"produces_for":["chaos-engineer","red-team-orchestrator","skill-evolver","spec-oracle"],"estimated_tokens":"3000-8000","path":"skills/cortx-core/experimental/hypothesis-generator/SKILL.md"},{"name":"immune-memory","description":"Maintains a pathogen library (known attack patterns) and antibody library (defenses). Every spec automatically inherits immunity to all known attack classes. Prevents autoimmune response (over-blocking legitimate users). Adapts to novel pathogens with quarantine + global distribution. Triggered by \"apply immune memory\", \"inherit defenses\", \"check pathogens\", or automatically during spec-developer Phase 5.","version":"4","stability":"experimental","model":"opus","tools":["Read","Write","Grep","Glob","WebSearch"],"uses_tools":["web_search"],"consumes_from":["spec-developer","red-team-orchestrator","security-reviewer","chaos-engineer"],"produces_for":["enforcement-orchestrator","sentinel-compiler"],"estimated_tokens":"5000-15000","path":"skills/cortx-core/experimental/immune-memory/SKILL.md"},{"name":"intent-verifier","description":"Verifies that implemented code achieves the semantic INTENT of spec invariants, not just their syntactic form. Weekly production audits ask \"did the handler return 410?\" (syntactic) AND \"did terminated tenants experience graceful degradation?\" (intent). Catches the gap between spec-compliant-but-subtly-wrong. Triggered by \"verify intent\", \"weekly intent audit\", \"does this actually do what the spec meant\".","version":"4","stability":"experimental","model":"opus","tools":["Read","Write","Grep","Glob","WebSearch"],"uses_tools":["web_search"],"consumes_from":["spec-developer","epic-implementer"],"produces_for":["incident-commander"],"estimated_tokens":"5000-12000","path":"skills/cortx-core/experimental/intent-verifier/SKILL.md"},{"name":"knowledge-thermodynamics-gc","description":"Use when CorTxOS's append-only knowledge stores (error-corpus, architecture-cache, and later operational-history / domain-model) have accumulated stale signal that is crowding live context. The skill identifies stale entries per the staleness rules in knowledge-thermodynamics-protocol.md, compacts them into signed archives under docs/cortx/archives/, and records the compaction in error-corpus. Default mode is dry-run; --apply mutates. Refuses to compact entries with pqc_required:true / non-empty compliance / shared_refs references (load-bearing retention overrides).","version":"3","stability":"experimental","model":"opus","tools":["Read","Write","Edit","Bash","Grep","Glob"],"uses_tools":["bash_tool"],"consumes_from":["cortx-brain","error-corpus","architecture-cache"],"produces_for":["cortx-brain"],"estimated_tokens":"3000-9000","path":"skills/cortx-core/experimental/knowledge-thermodynamics-gc/SKILL.md"},{"name":"physics-budgeter","description":"Declares and enforces physical budgets on spec clauses — energy, latency, thermodynamic, information-theoretic, and causality constraints. Respects speed-of-light, Landauer limits, Shannon bounds. Critical for planetary + lunar deployments where physics binds. Triggered by \"add physics budget\", \"physics check\", \"thermodynamic review\", or automatically during spec-developer Phase 3.","version":"4","stability":"experimental","model":"opus","tools":["Read","Write","Grep","Glob","WebSearch"],"uses_tools":["web_search"],"consumes_from":["spec-developer","observability-architect"],"produces_for":["energy-accountant","sentinel-compiler"],"estimated_tokens":"3000-10000","path":"skills/cortx-core/experimental/physics-budgeter/SKILL.md"},{"name":"provenance-grapher","description":"Maintains the ancestry graph of every invariant, decision, and spec clause. Every change has provenance: who proposed it, what evidence supports it, what debate refined it, what sentinels enforce it, what depends on it. Makes \"why is this here?\" a queryable operation with full citation chains. Triggered by \"show provenance for INV-T02\", \"trace this decision\", \"what depends on X\", \"who added this clause\".","version":"4","stability":"experimental","model":"opus","tools":["Read","Write","Grep","Glob"],"uses_tools":["conversation_search","visualize:show_widget"],"consumes_from":["spec-developer","red-team-orchestrator","plan-tournament"],"produces_for":["spec-oracle"],"estimated_tokens":"3000-10000","path":"skills/cortx-core/experimental/provenance-grapher/SKILL.md"},{"name":"sentinel-compiler","description":"Compiles invariants from spec-developer's Layer 4 (behavioral) and Layer 5 (security) into runtime enforcement code across all applicable layers of the active implementation stack. Defense in depth by construction. Triggered by \"compile sentinels\", \"enforce this invariant\", \"generate runtime guards\", or automatically after spec-developer completes Layer 4/5.","version":"4","stability":"experimental","model":"opus","tools":["Read","Write","Grep","Glob","WebSearch"],"uses_tools":["web_search"],"consumes_from":["spec-developer","ethics-enforcer","energy-accountant","physics-budgeter","immune-memory"],"produces_for":["compliance-evidence-manager","enforcement-orchestrator"],"estimated_tokens":"8000-20000","path":"skills/cortx-core/experimental/sentinel-compiler/SKILL.md"},{"name":"spec-archaeologist","description":"Reconstructs specifications from legacy systems — code without specs, undocumented behavior, abandoned projects. Produces modern canonical specs with confidence intervals marking where inference is strong vs where human archaeology is needed. Enables brownfield adoption and modernization of decades-old systems. Triggered by \"recover specs from this codebase\", \"archaeology on legacy system X\", \"reverse-engineer the spec\".","version":"4","stability":"experimental","model":"opus","tools":["Read","Write","Grep","Glob","WebSearch"],"uses_tools":["web_search"],"consumes_from":["user"],"produces_for":["spec-developer"],"estimated_tokens":"10000-30000","path":"skills/cortx-core/experimental/spec-archaeologist/SKILL.md"},{"name":"spec-bisect","description":"Binary-search across spec versions to find which change introduced a behavior regression. Like git bisect but for specifications. Takes a bug reproducer + known-good version + known-bad version, narrows the introducing spec version, and identifies the specific clause change responsible. Triggered by \"bisect this bug\", \"which spec version broke this\", \"find the spec regression\".","version":"5","stability":"experimental","model":"opus","tools":["Read","Write","Grep","Glob"],"uses_tools":[],"consumes_from":["spec-developer","drift-monitor"],"produces_for":[],"estimated_tokens":"3000-10000","path":"skills/cortx-core/experimental/spec-bisect/SKILL.md"},{"name":"spec-oracle","description":"Answers natural-language questions about any spec across the product ecosystem. Composes across products via spec-federator when queries span boundaries. Maintains a queryable index of all specs, invariants, endpoints, authorizations, and NFR budgets. Triggered by questions like \"what's the auth for CreateTenant\", \"who enforces INV-T02\", \"what's the latency SLO for <operation>\", or general \"why is it this way\" inquiries.","version":"4","stability":"experimental","model":"opus","tools":["Read","Write","Grep","Glob"],"uses_tools":["conversation_search","recent_chats"],"consumes_from":["spec-developer","spec-federator","cortx-brain","provenance-grapher","hypothesis-generator"],"produces_for":["user"],"estimated_tokens":"3000-12000","path":"skills/cortx-core/experimental/spec-oracle/SKILL.md"},{"name":"spec-review-scheduler","description":"Use when temporal-analyzer decay recommendations or lifecycle-manager senescence signals need to become tracked, owned, enforced review tasks instead of rotting in reports. Triggers include \"schedule the spec reviews\", \"who owns this stale clause\", \"turn decay recommendations into tasks\", \"track spec-review completion\", \"what reviews are overdue\", \"assign review for TEC-00142\", or automatically after temporal-analyzer / lifecycle-manager emit fresh signals.","version":"2","stability":"experimental","model":"opus","tools":["Read","Write","Grep","Glob"],"uses_tools":[],"consumes_from":["temporal-analyzer","lifecycle-manager"],"produces_for":["cortx-brain"],"estimated_tokens":"3000-7000","path":"skills/cortx-core/experimental/spec-review-scheduler/SKILL.md"},{"name":"treaty-negotiator","description":"Manages cryptographically-signed bilateral specifications between organizations. Replaces PDF contracts with versioned, enforceable treaties. Supports amendment protocols, mutual signing, regulatory witness, dispute arbitration, and termination procedures. Triggered by \"draft treaty with <partner>\", \"sign treaty\", \"amend treaty\", or automatically when cross-org dependencies are established.","version":"4","stability":"experimental","model":"opus","tools":["Read","Write","Grep","Glob","WebSearch"],"uses_tools":["web_search"],"consumes_from":["spec-developer","spec-federator"],"produces_for":["cortx-brain","ethics-enforcer"],"estimated_tokens":"5000-15000","path":"skills/cortx-core/experimental/treaty-negotiator/SKILL.md"},{"name":"feature-flag-curator","description":"Use when governing the lifecycle of feature flags — naming conventions, owner assignment, kill-switch strategy, TTL-before-removal, and retirement workflow — across LaunchDarkly / Unleash / Flipt as flag-as-code. Triggers include \"govern the feature flags\", \"audit our flags\", \"set up flag naming conventions\", \"assign flag owners\", \"what's our kill-switch strategy\", \"this flag has no owner\", \"retire this flag\", \"clean up flag debt\", \"review stale flags\", \"add a flag governance gate\", or when devops-architect ships a pipeline that introduces flags with no governance attached. Prevents flag debt — orphaned, owner-less, permanent flags that rot in the codebase.","version":"5","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob"],"uses_tools":[],"consumes_from":["devops-architect","observability-architect"],"produces_for":[],"estimated_tokens":"2000-4000","path":"skills/cortx-core/feature-flag-curator/SKILL.md"},{"name":"feedback-loop-auditor","description":"Use when you need to measure whether incident remediations actually prevent recurrence — \"did our fixes work\", \"prevention ROI\", \"are remediation items closing the loop\", \"audit the feedback loop\", \"which remediation types pay off\", \"compute prevention ROI\", \"track remediation effectiveness\", \"are we fixing the right things\", or on a scheduled cadence after a batch of postmortems land. Tracks incident-commander remediation items over time, correlates them with future incident patterns, and computes prevention-ROI per remediation type (code/config/process) — closing the drift→incident→prevention loop with measurable evidence.","version":"6","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob"],"uses_tools":[],"consumes_from":["incident-commander","fitness-monitor","error-corpus"],"produces_for":["cortx-brain"],"estimated_tokens":"2000-5000","path":"skills/cortx-core/feedback-loop-auditor/SKILL.md"},{"name":"fitness-monitor","description":"The vital signs monitor of the skill ecosystem. Continuously measures skill fitness, pipeline efficiency, product health, and evolution velocity. Produces dashboards and alerts when metrics cross thresholds. Triggers include \"how are the skills doing\", \"pipeline health\", \"show me the dashboard\", \"what's degrading\", or automatically after every pipeline run and every evolution cycle.","version":"7","stability":"stable","model":"opus","tools":["Read","Write","Edit","Grep","Glob"],"uses_tools":["visualize:show_widget"],"consumes_from":["cortx-orchestrator","cortx-brain","emergent-capability-detector"],"produces_for":["cortx-brain","user","agent-budget-governor","emergent-capability-detector","feedback-loop-auditor","incident-pattern-analyzer","lifecycle-manager","skill-evolver"],"estimated_tokens":"1500-3000","path":"skills/cortx-core/fitness-monitor/SKILL.md"},{"name":"frontend-architect","description":"Cross-cutting lens that enriches principal-engineer's design with frontend-specific architecture when any component targets TypeScript/React/MUI/Solid.js/Flutter/Tauri. Produces a frontend-architecture addendum covering component tree, state management, routing, design tokens, accessibility, i18n, rendering-perf budgets (Core Web Vitals — LCP/INP/CLS), visual-regression baselines, and bundle-size budgets. NOT a pipeline stage; invoked by principal-engineer via may_invoke when §3 classifies any UI component. Triggers include: \"design the frontend\", \"UI architecture\", \"review the React design\", \"accessibility audit\", \"set Core Web Vitals targets\", \"design token system\".","version":"5","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob","WebSearch"],"uses_tools":["web_search","ask_user_input_v0","visualize:show_widget"],"consumes_from":["principal-engineer"],"produces_for":["a11y-remediator","component-library-steward","design-system-curator","epic-implementer","observability-architect","technical-writer","testing-strategist"],"estimated_tokens":"3000-8000","path":"skills/cortx-core/frontend-architect/SKILL.md"},{"name":"ideator","description":"Use at the very front of product thinking, BEFORE product-manager — when a user arrives with a raw idea (\"I want to build an AI first platform for X\") or strategic impulse and needs to shape it into a crisp problem statement, vision, and strategic context before any epic backlog can be generated. Runs a 4-phase interactive loop (explore real → stretch creative → constrain feasibility → synthesize) using 12 creative-prompt scaffolds. Produces vision-level artifacts (PRFAQ, executive summary, problem statement, value proposition, market landscape, strategic bets, success criteria, out-of-scope, pitch deck outline). Does NOT produce design docs, implementation plans, testing plans, deployment plans, or epics — those belong to downstream skills (principal-engineer, epic-implementer, testing-strategist, devops-architect, product-manager respectively).","version":"9","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob","Bash","WebSearch"],"uses_tools":["web_search","ask_user_input_v0","present_files"],"consumes_from":["user","brownfield-onboarder"],"produces_for":["epic-developer","product-manager"],"estimated_tokens":"6000-12000","path":"skills/cortx-core/ideator/SKILL.md"},{"name":"incident-commander","description":"Use when responding to production incidents, writing postmortems, conducting root cause analysis, or defining incident response procedures. Triggers include \"write a postmortem\", \"what went wrong\", \"incident report\", \"root cause analysis\", \"RCA\", \"define incident response\", \"on-call procedures\", or when a production alert fires and the team needs structured incident management. Also use when reviewing past incidents to extract patterns and prevent recurrence.","version":"11","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob"],"uses_tools":["conversation_search","ask_user_input_v0","visualize:show_widget","message_compose_v1"],"consumes_from":["observability-architect","devops-architect","chaos-engineer","drift-monitor","intent-verifier"],"produces_for":["cortx-brain","feedback-loop-auditor","incident-pattern-analyzer","skill-improver"],"estimated_tokens":"2000-5000","path":"skills/cortx-core/incident-commander/SKILL.md"},{"name":"incident-pattern-analyzer","description":"Use when analyzing postmortems ACROSS products to find recurring root causes, escalating systemic failures, or proposing cross-product prevention rules. Triggers include \"are these incidents related\", \"do we keep failing the same way\", \"cross-product incident patterns\", \"is this a systemic failure\", \"find recurrence across products\", \"what root causes repeat\", \"roll up the postmortems\", or when incident-commander has emitted postmortems for the same root cause in more than one product. Distinct from feedback-loop-auditor (which measures remediation ROI) — this skill detects the recurrence, not the payoff.","version":"6","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob"],"uses_tools":[],"consumes_from":["incident-commander","error-corpus","fitness-monitor"],"produces_for":["cortx-brain"],"estimated_tokens":"2000-5000","path":"skills/cortx-core/incident-pattern-analyzer/SKILL.md"},{"name":"lifecycle-manager","description":"Treats specs as biological organisms with lifecycle stages — conception, gestation, birth, growth, maturity, senescence, death, legacy. Provides health indicators, reproduction mechanisms (spec descendants), and graceful death rituals (knowledge transfer). Triggered by \"retire this spec\", \"spec health check\", \"graduate to mature\", or automatically based on age + fitness signals.","version":"8","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob"],"uses_tools":[],"consumes_from":["spec-developer","fitness-monitor","temporal-analyzer"],"produces_for":["cortx-brain","retrospective-facilitator","spec-review-scheduler"],"estimated_tokens":"3000-8000","path":"skills/cortx-core/lifecycle-manager/SKILL.md"},{"name":"load-test-architect","description":"Use when designing or validating MACRO performance under load — concurrent-user profiles, stress/saturation curves, 24h+ soak tests, SLA-under-load validation, resource profiling, and load-generator deployment. Triggers include \"design the load test\", \"will this hold N concurrent users\", \"find the saturation point\", \"run a soak test\", \"validate the SLA under load\", \"stress test this service\", \"what's our breaking point\", \"size the load generators\", or when epic-implementer ships a service whose §9 perf targets must be proven under sustained traffic. Recommends and wires k6 / Locust / JMeter against the CorTxOS stack (NATS + protobuf + PostgreSQL + ClickHouse on GKE). Distinct from testing-strategist (micro pyramid) and chaos-engineer (adversarial spec-simulation).","version":"5","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob","Bash","WebSearch","WebFetch"],"uses_tools":["web_search","web_fetch"],"consumes_from":["principal-engineer","spec-developer","testing-strategist","observability-architect"],"produces_for":[],"estimated_tokens":"4000-7000","path":"skills/cortx-core/load-test-architect/SKILL.md"},{"name":"migration-planner","description":"Use when a design replaces existing functionality and needs a migration path — data migrations, API version coexistence, client upgrade paths, rollback strategies. Triggers include \"breaking change\", \"migration plan\", \"upgrade path\", \"backwards compatibility\", \"data migration\", \"schema migration\", or when principal-engineer §13 reveals a non-trivial migration. Mandatory in the Platform pipeline template.","version":"8","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob","Bash"],"uses_tools":[],"consumes_from":["principal-engineer"],"produces_for":["deprecation-manager","devops-architect"],"estimated_tokens":"2000-4000","path":"skills/cortx-core/migration-planner/SKILL.md"},{"name":"observability-architect","description":"Use when designing or implementing monitoring, alerting, dashboards, SLOs, structured logging, distributed tracing, or runbooks for a product. Triggers include \"set up monitoring\", \"create dashboards\", \"define SLOs\", \"configure alerts\", \"write the runbook\", \"add observability\", \"what should we monitor\", or when a deployed service needs production visibility. Targets the CorTxOS observability stack (Prometheus + Grafana + Tempo + Loki + OpenTelemetry + PagerDuty + Jira). This skill ensures every service is observable from day one.","version":"12","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob","WebSearch"],"uses_tools":["web_search","visualize:show_widget"],"consumes_from":["spec-developer","agentic-architect","devops-architect","principal-engineer","epic-developer","frontend-architect"],"produces_for":["agent-budget-governor","agent-cascade-resolver","autonomous-incident-responder","compliance-evidence-manager","deprecation-manager","feature-flag-curator","incident-commander","load-test-architect","physics-budgeter","technical-writer"],"estimated_tokens":"3000-6000","path":"skills/cortx-core/observability-architect/SKILL.md"},{"name":"plan-tournament","description":"Objectively ranks multiple technical plans produced from the same spec by running them in parallel through weighted-metric scoring. Eliminates architecture-by-taste. Triggered by \"run a plan tournament\", \"explore alternatives\", \"which plan is best\", \"compare these approaches\", or automatically after principal-engineer produces a design when tournament mode is enabled (--explore=N).","version":"10","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob","Bash","WebSearch"],"uses_tools":["web_search","conversation_search","visualize:show_widget"],"consumes_from":["principal-engineer","cortx-brain"],"produces_for":["counterfactual-tracker","provenance-grapher","spec-developer"],"estimated_tokens":"15000-45000","path":"skills/cortx-core/plan-tournament/SKILL.md"},{"name":"pr-review-coordinator","description":"Use when orchestrating pull-request review at the PR level — managing review state across multiple reviewers, blocking a merge until review gates pass, tracking review velocity, or producing a Review Consensus Report. Triggers include \"coordinate the PR review\", \"what's blocking this PR\", \"is this PR ready to merge\", \"track review status\", \"who still needs to approve\", \"run the review gate\", \"build the review consensus\", \"is the review quorum met\", or when a PR opens and needs review-state orchestration across coding-standards (inline lint), security-reviewer (security gate), and testing-strategist (coverage gate). coding-standards is tactical inline lint and the /code-review CLI is one-off; this skill is the only owner of PR-level review orchestration.","version":"5","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob"],"uses_tools":[],"consumes_from":["coding-standards","security-reviewer","testing-strategist"],"produces_for":[],"estimated_tokens":"2500-5000","path":"skills/cortx-core/pr-review-coordinator/SKILL.md"},{"name":"principal-engineer","description":"Use when given an epic plus Gherkin user stories and asked to produce an implementation-ready technical design, architecture, or engineering spec for a senior engineer to build from. Triggers include \"design this\", \"break down into components\", \"write the tech design\", \"how would you build this\", \"turn these stories into a build plan\". Produces a buildable design for the CorTxOS stack (Go+Rust+TS, NATS+protobuf, PostgreSQL/RocksDB/Valkey/ClickHouse, SPIFFE+OPA+Vault, PQC, Helm+ArgoCD+GKE) with FedRAMP/CMMC/SOC 2/GDPR/ITAR compliance.","version":"13","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob"],"uses_tools":["ask_user_input_v0","visualize:show_widget","present_files"],"consumes_from":["epic-developer","story-creator","testing-strategist","brownfield-onboarder"],"produces_for":["agentic-architect","architecture-cache","architecture-variant-generator","coding-standards","cognitive-load-analyzer","cost-estimator","counterfactual-tracker","database-architect","devops-architect","epic-implementer","frontend-architect","hypothesis-generator","load-test-architect","migration-planner","observability-architect","plan-tournament","privacy-dpia-reviewer","security-reviewer","spec-developer","technical-writer","testing-strategist","threat-model-architect"],"estimated_tokens":"5000-10000","path":"skills/cortx-core/principal-engineer/SKILL.md"},{"name":"privacy-dpia-reviewer","description":"Use when a feature, design, or system processes personal data and you need a GDPR Article 35 Data-Protection Impact Assessment or a privacy-by-design review — \"run a DPIA on this epic\", \"do we need a DPIA for X\", \"privacy-by-design review\", \"GDPR Article 35 assessment\", \"build the record of processing activities\", \"map the consent flow\", \"what's our data-retention policy for Y\", \"is this processing high-risk\", \"review the privacy posture\", \"data minimisation check\", or when security-reviewer emits a privacy-affecting threat that needs a privacy-specific assessment. Conducts the DPIA lifecycle (necessity + proportionality test, risk-to-data-subjects scoring, mitigation register, residual-risk verdict) and produces the privacy-artifact chain (record of processing activities, lawful-basis + consent-flow map, retention/erasure policy, data-subject-rights matrix). Complements security-reviewer, which MAPS GDPR controls but conducts NO DPIAs.","version":"5","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob"],"uses_tools":[],"consumes_from":["security-reviewer","principal-engineer","epic-developer"],"produces_for":[],"estimated_tokens":"3000-6000","path":"skills/cortx-core/privacy-dpia-reviewer/SKILL.md"},{"name":"product-manager","description":"Use at the very start of product thinking — when the user has a business goal, problem statement, market opportunity, strategic theme, or \"what should we build next?\" and wants ideas surfaced and shaped into candidate epics. Acts as a product manager who ideates, prioritises, and curates a ranked backlog of epic-sized ideas. Does NOT write Gherkin stories (that's story-creator) and does NOT produce technical designs (that's principal-engineer). Also triggers when incident-commander remediation items need to enter the backlog.","version":"12","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob","WebSearch"],"uses_tools":["web_search","ask_user_input_v0","present_files"],"consumes_from":["ideator","user","brownfield-onboarder"],"produces_for":["epic-developer"],"estimated_tokens":"3000-6000","path":"skills/cortx-core/product-manager/SKILL.md"},{"name":"red-team-orchestrator","description":"Coordinates 6 specialized adversarial agents (Breaker, Lawyer, Economist, Scaler, Future, Malicious Insider) to stress-test specs before code is written. Each agent has a distinct attack surface. Findings flow into structured debate with blue team (spec-developer). Produces debate transcript as institutional knowledge. Triggered by \"red team this spec\", \"stress test the design\", \"attack mode\", or automatically after spec-developer finalizes Layer 4/5 of any spec.","version":"8","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob","WebSearch"],"uses_tools":["web_search"],"consumes_from":["spec-developer","hypothesis-generator"],"produces_for":["immune-memory","provenance-grapher","security-reviewer"],"estimated_tokens":"10000-25000","path":"skills/cortx-core/red-team-orchestrator/SKILL.md"},{"name":"release-notes-curator","description":"Use when producing CUSTOMER-facing release notes for a shipped version — synthesizing breaking changes, success metrics, and performance improvements into a polished, audience-ready announcement. Triggers include \"write the customer release notes\", \"what do customers need to know about this release\", \"draft the release announcement\", \"curate release notes for v2.0\", \"what's the customer impact of these breaking changes\", \"produce the upgrade guide for users\", \"summarize this release for product\", or when semantic-differ emits BREAKING changes that need a customer migration checklist. This is the DAG-wired customer-facing curator — distinct from the technical-writer Keep-a-Changelog and from the project operator runbook under docs/release-notes/.","version":"5","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob"],"uses_tools":[],"consumes_from":["semantic-differ","technical-writer","epic-developer","deprecation-manager"],"produces_for":["user"],"estimated_tokens":"2000-5000","path":"skills/cortx-core/release-notes-curator/SKILL.md"},{"name":"retrospective-facilitator","description":"Use after a pipeline run completes to conduct a structured retrospective. Reviews the pipeline execution holistically — what went well, what failed, what to change. Different from skill-improver (which reviews individual skills) — this reviews the PIPELINE as a whole. Triggers include \"run a retro\", \"what went well\", \"pipeline retrospective\", \"review the run\", or automatically after cortx-orchestrator completes a run.","version":"8","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob"],"uses_tools":["ask_user_input_v0","visualize:show_widget"],"consumes_from":["cortx-orchestrator","lifecycle-manager"],"produces_for":["skill-evolver"],"estimated_tokens":"2000-4000","path":"skills/cortx-core/retrospective-facilitator/SKILL.md"},{"name":"sbom-and-supply-chain-manager","description":"Use when you need to author, validate, or refresh a Software Bill of Materials and supply-chain attestations for a product — \"generate the SBOM\", \"produce a CycloneDX bill of materials\", \"update the SBOM after the dependency bump\", \"create the SLSA provenance attestation\", \"what components ship in this image\", \"track per-component license and CVE status\", \"is our SBOM current\", \"attest the build provenance\", or whenever dependency-updater changes a lockfile and the SBOM must be regenerated. Authors and maintains CycloneDX 1.5+ SBOMs and SLSA provenance, tracks per-component version/license/CVE status, and keeps both current after every dependency change. Targets the CorTxOS supply-chain stack (cargo-cyclonedx + cyclonedx-gomod + cyclonedx-npm, Syft, cosign attest, in-toto/SLSA provenance, Trivy + Grype enrichment, Rekor transparency log, FIPS 203/204/205 PQC signing posture).","version":"5","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob","Bash"],"uses_tools":[],"consumes_from":["dependency-updater","devops-architect","security-reviewer"],"produces_for":[],"estimated_tokens":"3000-6000","path":"skills/cortx-core/sbom-and-supply-chain-manager/SKILL.md"},{"name":"secrets-vault-manager","description":"Use when governing day-2 Vault secret lifecycle for a product — \"set up secret rotation\", \"schedule rotation for the signing keys\", \"why did rotation fail\", \"audit the rotation history\", \"who owns this secret\", \"emergency access to a production secret\", \"rotate the database password now\", \"is our PQC key rotation on schedule\", \"track ML-DSA / ML-KEM key rotation\", \"break-glass access\", or when devops-architect has wired ExternalSecrets and security-reviewer has set the crypto posture but nothing is monitoring whether secrets actually rotate on their declared cadence. Owns rotation scheduling, rotation-failure detection, rotation audit trails, per-secret ownership, emergency-access (break-glass) protocols, and PQC key-rotation tracking (ML-DSA-87 90-day, ML-KEM-1024 365-day, SLH-DSA-256f 10-year, hybrid ECDSA P-384 fallback) per pqc-posture.md. Targets the CorTxOS secrets stack (HashiCorp Vault KV v2 + dynamic engines + ExternalSecrets + SPIFFE identity + cert-manager + Merkle-chained audit).","version":"5","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob","Bash"],"uses_tools":[],"consumes_from":["security-reviewer","devops-architect"],"produces_for":[],"estimated_tokens":"3000-6000","path":"skills/cortx-core/secrets-vault-manager/SKILL.md"},{"name":"security-reviewer","description":"Use when reviewing any artifact for security posture — code, designs, stories, epics, or architecture docs. Triggers include \"review security\", \"threat model this\", \"audit the security\", \"check the crypto posture\", \"is this compliant\", or when any pipeline skill needs to validate §8 (security design). This is a cross-cutting lens, not a pipeline stage — it is invoked BY other skills and can also be invoked directly for standalone security reviews. Targets the CorTxOS security posture (PQC per FIPS 203/204/205, SPIFFE/SPIRE, OPA Rego + Neo4j auth, Merkle-chained audit, Vault, TLS 1.3 with PQC cipher suites) against FedRAMP High / CMMC L3 / SOC 2 Type II / GDPR Art. 32 / ITAR §120.10 compliance frameworks.","version":"14","stability":"stable","model":"opus","tools":["Read","Write","Edit","Grep","Glob","Bash","WebSearch","WebFetch"],"uses_tools":["web_search","web_fetch"],"consumes_from":["principal-engineer","agentic-architect","story-creator","epic-developer","user","red-team-orchestrator","authority-chain-enforcer","dependency-updater"],"produces_for":["compliance-evidence-manager","immune-memory","pr-review-coordinator","privacy-dpia-reviewer","sbom-and-supply-chain-manager","secrets-vault-manager","vulnerability-and-cve-coordinator"],"estimated_tokens":"3000-6000","path":"skills/cortx-core/security-reviewer/SKILL.md"},{"name":"semantic-differ","description":"Computes structured semantic diffs across all 7 spec layers (wire, API, data, behavioral, security, observability, contract). Classifies every change as COMPATIBLE, ADDITIVE, or BREAKING. Identifies affected consumers via federation manifest. Produces migration guides for breaking changes. Triggered by \"diff spec v1.2 to v1.3\", \"what changed\", \"is this backward compatible\", \"compute breaking changes\".","version":"8","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob"],"uses_tools":[],"consumes_from":["spec-developer"],"produces_for":["deprecation-manager","release-notes-curator","technical-writer","version-lifecycle-manager"],"estimated_tokens":"3000-12000","path":"skills/cortx-core/semantic-differ/SKILL.md"},{"name":"skill-evolver","description":"The evolutionary engine of the skill ecosystem. Goes far beyond skill-improver — it extracts successful PATTERNS from high-performing skills and cross-pollinates them to weaker skills, detects GAPS where no skill exists and auto-generates draft skills, maintains a SKILL GENOME that tracks how each skill's DNA evolves over time, and runs continuous NATURAL SELECTION where skills below fitness threshold are automatically improved or deprecated. Triggers include \"evolve the skills\", \"what patterns are working\", \"generate a new skill for X\", \"cross-pollinate\", \"run natural selection\", or automatically after every 5 pipeline runs.","version":"8","stability":"stable","model":"opus","tools":["Read","Write","Edit","Grep","Glob"],"uses_tools":["memory_user_edits"],"consumes_from":["skill-improver","fitness-monitor","retrospective-facilitator","cortx-brain","agent-behavior-vetter","error-corpus","emergent-capability-detector","hypothesis-generator"],"produces_for":["every-skill","cortx-brain"],"estimated_tokens":"3000-8000","path":"skills/cortx-core/skill-evolver/SKILL.md"},{"name":"skill-improver","description":"Use when a skill has been invoked one or more times and you want to evaluate how well it performed and propose or apply concrete improvements to the skill's SKILL.md. Acts as a reviewer + editor — reads the skill, its produced artifacts, and the invocation transcripts, grades output quality against the skill's own contract, identifies recurring failure modes, and emits a diff-ready patch plan. Also invoked by incident-commander to improve skills that contributed to production incidents. Distinct from skill-author (which creates new skills) — skill-improver improves existing ones in a closed loop.","version":"10","stability":"stable","model":"opus","tools":["Read","Write","Edit","Grep","Glob"],"uses_tools":["conversation_search","visualize:show_widget","present_files"],"consumes_from":["epic-implementer","incident-commander","every-skill","cortx-orchestrator","emergent-capability-detector"],"produces_for":["every-skill","skill-evolver"],"estimated_tokens":"3000-8000","path":"skills/cortx-core/skill-improver/SKILL.md"},{"name":"spec-developer","description":"Use when transforming a principal-engineer design into machine-verifiable, executable, runtime-enforced specifications. Produces 8-layer specs (wire/API/data/behavioral/security/observability/contract/agent-runtime), simulates them, runs adversarial attacks, compiles runtime sentinels, and federates across products. Triggers include \"write the spec\", \"specify this\", \"spec out the design\", \"simulate this spec\", \"attack this spec\", \"what does the spec say about X\", or automatically as pipeline stage 4.5 between principal-engineer and epic-implementer.","version":"13","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob","WebSearch","WebFetch"],"uses_tools":["web_search","web_fetch","ask_user_input_v0","visualize:show_widget","present_files","conversation_search"],"consumes_from":["principal-engineer","agentic-architect","story-creator","architecture-cache","spec-archaeologist","brownfield-onboarder","plan-tournament"],"produces_for":["authority-chain-enforcer","chaos-engineer","cognitive-load-analyzer","database-architect","devops-architect","doc-reality-checker","drift-monitor","energy-accountant","epic-implementer","ethics-enforcer","hypothesis-generator","immune-memory","intent-verifier","lifecycle-manager","load-test-architect","observability-architect","physics-budgeter","provenance-grapher","red-team-orchestrator","semantic-differ","sentinel-compiler","spec-bisect","spec-federator","spec-oracle","technical-writer","temporal-analyzer","testing-strategist","treaty-negotiator"],"estimated_tokens":"4000-12000","path":"skills/cortx-core/spec-developer/SKILL.md"},{"name":"spec-federator","description":"Manages cross-product canonical types, shared invariants, and federation manifests so specs from different products compose coherently. Maintains a registry of owned-vs-imported types with cryptographic signatures for authenticity. Triggered by \"federate these specs\", \"add canonical type\", \"cross-product dependency check\", or automatically when spec-developer imports types from other products.","version":"7","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob","WebSearch","WebFetch"],"uses_tools":["web_search","web_fetch"],"consumes_from":["spec-developer","cortx-brain"],"produces_for":["spec-oracle","treaty-negotiator"],"estimated_tokens":"5000-12000","path":"skills/cortx-core/spec-federator/SKILL.md"},{"name":"story-creator","description":"Use when the user has a researched epic (from epic-developer) and asks to \"break it down into stories\", \"write the Gherkin\", \"decompose the epic\", \"generate acceptance criteria\", \"produce the test scenarios with sample data\", or \"story-developer\" / \"develop stories for the epic\". Acts as a senior BDD analyst that decomposes a researched epic into N exhaustively detailed user stories — one mandatory story per §7 capability — each in Gherkin with positive/negative/edge/concurrency/observability/audit scenarios, a data dictionary with concrete sample values, non-functional targets, and Definition of Done. Never leaves an epic without full story coverage.","version":"10","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob"],"uses_tools":["present_files"],"consumes_from":["epic-developer","brownfield-onboarder"],"produces_for":["cortx-orchestrator","epic-implementer","principal-engineer","security-reviewer","spec-developer","testing-strategist"],"estimated_tokens":"4000-8000","path":"skills/cortx-core/story-creator/SKILL.md"},{"name":"technical-writer","description":"Use when producing user documentation, API documentation, changelogs, migration guides, architecture decision records (ADRs), README files, or any developer-facing written deliverable. Triggers include \"write the docs\", \"document this API\", \"create a changelog\", \"migration guide\", \"write an ADR\", \"README for this\", \"developer guide\", or when any pipeline skill produces an artifact that needs user-facing documentation. This is a cross-cutting lens that can be invoked at any stage.","version":"10","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob"],"uses_tools":["present_files"],"consumes_from":["spec-developer","principal-engineer","epic-implementer","devops-architect","observability-architect","frontend-architect","semantic-differ"],"produces_for":["user","doc-reality-checker","release-notes-curator"],"estimated_tokens":"2000-5000","path":"skills/cortx-core/technical-writer/SKILL.md"},{"name":"technology-radar","description":"Keeps the ecosystem tech stack perpetually current. Scans for new tool versions, evaluates new technologies, proposes migrations, and ensures every skill invocation uses the latest stable tooling as of the execution date. Reads `shared/references/core/architectural-invariants.md` to know which technologies to scan. Triggers on \"check for updates\", \"technology radar\", \"is our stack current\", \"what's new in X\", or automatically on a weekly schedule and before any pipeline run that touches infrastructure.","version":"7","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob","WebSearch","WebFetch"],"uses_tools":["web_search","web_fetch","memory_user_edits"],"consumes_from":["devops-architect","coding-standards","dependency-updater"],"produces_for":["cortx-brain","temporal-analyzer"],"estimated_tokens":"2000-5000","path":"skills/cortx-core/technology-radar/SKILL.md"},{"name":"temporal-analyzer","description":"Tracks per-clause confidence decay over time as the environment evolves. Predicts obsolescence probability at 90d/365d/1825d horizons based on technology radar signals, CVE feeds, and industry adoption. Proactively recommends spec updates before bugs appear. Triggered by \"which specs are stale\", \"temporal review\", \"what needs updating\", or automatically weekly.","version":"7","stability":"stable","model":"opus","tools":["Read","Write","Edit","Grep","Glob","WebSearch"],"uses_tools":["web_search"],"consumes_from":["spec-developer","technology-radar"],"produces_for":["cortx-brain","lifecycle-manager","spec-review-scheduler"],"estimated_tokens":"3000-10000","path":"skills/cortx-core/temporal-analyzer/SKILL.md"},{"name":"testing-strategist","description":"Use when designing a test strategy for an epic, story set, or component. Triggers include \"design the test strategy\", \"what tests do we need\", \"plan the test pyramid\", \"fuzz testing strategy\", \"chaos engineering plan\", \"how should we test this\", or when principal-engineer §12 needs deeper test planning. Also use when reviewing test coverage gaps, designing property-based tests, or planning performance benchmarks.","version":"8","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob","Bash"],"uses_tools":[],"consumes_from":["spec-developer","principal-engineer","story-creator","epic-developer","frontend-architect"],"produces_for":["a11y-remediator","component-library-steward","epic-implementer","load-test-architect","pr-review-coordinator","principal-engineer"],"estimated_tokens":"3000-5000","path":"skills/cortx-core/testing-strategist/SKILL.md"},{"name":"threat-model-architect","description":"Use when a feature needs an upfront threat model BEFORE design — during epic research or at the start of a design, when the user says \"threat model this epic\", \"what could go wrong security-wise\", \"STRIDE this\", \"build an attack tree\", \"map the trust boundaries\", \"what are the abuse cases\", \"do a pre-design security analysis\", or when principal-engineer needs a security-design (§8) INPUT rather than a post-hoc review. Produces standalone pre-design threat models — STRIDE decomposition, attack trees, trust-boundary diagrams, and abuse/misuse cases — as first-class architecture inputs. Fills the UPSTREAM half of security (security-reviewer does the post-hoc review). Output feeds principal-engineer §8 and seeds security-reviewer's checklist.","version":"5","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob"],"uses_tools":[],"consumes_from":["epic-developer","principal-engineer"],"produces_for":[],"estimated_tokens":"3000-6000","path":"skills/cortx-core/threat-model-architect/SKILL.md"},{"name":"vulnerability-and-cve-coordinator","description":"Use when a CVE or vulnerability must be patched across MORE THAN ONE product in the portfolio and the work needs portfolio-wide triage, sequencing, and per-product deployment tracking. Triggers include \"coordinate this CVE across products\", \"portfolio CVE triage\", \"which products are affected by CVE-YYYY-NNNNN\", \"sequence these security patches\", \"what's our patch status for <CVE>\", \"a transitive dep just got a critical advisory — roll it out everywhere\", or when dependency-updater surfaces the same CVE in two or more products and a single-product PR is not enough. dependency-updater finds CVEs per-product; this skill adds the cross-product triage, blast-radius scoring, patch sequencing, and per-product deployment-status tracking the monorepo otherwise lacks.","version":"6","stability":"stable","model":"opus","tools":["Read","Write","Grep","Glob","Bash"],"uses_tools":[],"consumes_from":["dependency-updater","security-reviewer","devops-architect"],"produces_for":[],"estimated_tokens":"3000-6000","path":"skills/cortx-core/vulnerability-and-cve-coordinator/SKILL.md"},{"name":"cortx-auditor","description":"Use when the user says \"cortx-auditor\", \"cortx-auditer\", \"audit the skills\", \"deep audit\", \"check every SKILL.md\", or asks for corpus-wide structural/semantic verification of the CorTxOS skill catalog. Read-only corpus auditor — reads every SKILL.md and every shared reference, runs 85 grounded checks across 14 families (frontmatter schema, cross-file integrity, tools coherence, body sections, Activation Triggers, fence balance, content heuristics, semantic consistency, markdown hygiene, corpus invariants, governance, live-check script integration, content duplication & ambiguity, cross-check meta-rules), and produces a ranked findings report. Supports `--diff <ref>` for changed-files-only audits, `--fix-ready` to emit skill-improver patch plans, and inline `<!-- cortx-auditor: skip <check-id> -->` suppression. Writes per-run scores to `docs/cortx/metrics.jsonl` for trend tracking. Does NOT modify audited files; pair with skill-improver to apply fixes. Triggers include: \"cortx-auditor\", \"cortx-auditer\", \"audit the cortx skills\", \"deep audit\", \"run a corpus-wide check\", \"what's wrong with my skills\", \"audit what changed since <ref>\".","version":"5","stability":"meta","model":"opus","tools":["Read","Write","Bash","Grep","Glob"],"uses_tools":["present_files"],"consumes_from":["user"],"produces_for":["user","version-lifecycle-manager"],"estimated_tokens":"6000-14000","path":"skills/cortx-meta/cortx-auditor/SKILL.md"},{"name":"reference-loader","description":"Use when shared_refs must be loaded in a deterministic order, when a skill or the orchestrator is about to dispatch and every cited reference must be proven to exist first, when a circular shared_refs dependency is suspected, or when cross-product federation (spec-federator / treaty-negotiator) is about to pull references across product boundaries. Triggers include \"load the references\", \"resolve shared_refs\", \"check for circular reference deps\", \"pre-validate every cited reference exists\", \"what order do these refs load in\", \"validate the ref graph before dispatch\", or cortx-orchestrator emitting a reference-load request before a skill invocation.","version":"1","stability":"meta","model":"opus","tools":["Read","Grep","Glob"],"uses_tools":[],"consumes_from":["cortx-orchestrator"],"produces_for":[],"estimated_tokens":"2000-4000","path":"skills/cortx-meta/reference-loader/SKILL.md"},{"name":"skill-author","description":"Use when the user asks to \"create a new skill\", \"scaffold a skill\", \"add a skill for X\", \"author a skill\", or describes a capability CorTxOS should have and wants it installed as a first-class skill. This is a meta-skill — it operates on the CorTxOS framework itself, not on product artifacts. Runs a 5-phase dialog (brief → tier → contract → scaffold → validate) that ends with a new SKILL.md + eval fixtures and a green `cortx validate`. Refuses to ship without validator approval.","version":"2","stability":"meta","model":"opus","tools":["Read","Write","Edit","Bash","Grep","Glob"],"uses_tools":["ask_user_input_v0","present_files"],"consumes_from":["user"],"produces_for":[],"estimated_tokens":"4000-8000","path":"skills/cortx-meta/skill-author/SKILL.md"},{"name":"spec-synthesizer","description":"Use when the user has already written a structured skill spec (YAML per spec-synthesis-protocol.md) and wants it materialized as a validator-passing SKILL.md + evals in one pass with no dialog. Meta-tier sibling to skill-author — skill-author is dialog-first, this one is spec-first. Refuses to declare success until `bash scripts/cortx validate` exits 0.","version":"2","stability":"meta","model":"opus","tools":["Read","Write","Edit","Bash","Grep","Glob"],"uses_tools":["present_files"],"consumes_from":["user"],"produces_for":[],"estimated_tokens":"3000-7000","path":"skills/cortx-meta/spec-synthesizer/SKILL.md"},{"name":"version-lifecycle-manager","description":"Use when a skill's version history needs governance — \"bump the version\", \"what changed since version N\", \"is this version stale\", \"which skills need a version bump\", \"audit skill versions\", \"propagate the version bump for a breaking upstream change\", \"did anyone forget to bump\", \"this skill hasn't changed in 6 months\", or when cortx-auditor flags a stale-relative-to-content version. Meta-skill operating on the CorTxOS skill catalog itself, not on product artifacts. Tracks per-skill version history, enforces the monotonic-integer bump discipline from versioning-policy.md, detects stale versions (last edit > 6 months), and auto-generates version-bump PRs for every skill affected by an upstream BREAKING change. Complements scripts/check-skill-versions.sh (which only guards against placeholder versions) by reasoning about WHEN a bump is owed, not just whether the value is an integer.","version":"1","stability":"meta","model":"opus","tools":["Read","Write","Grep","Glob"],"uses_tools":[],"consumes_from":["cortx-auditor","semantic-differ","change-propagator"],"produces_for":["cortx-brain"],"estimated_tokens":"3000-6000","path":"skills/cortx-meta/version-lifecycle-manager/SKILL.md"}]</script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
+    const data = JSON.parse(document.getElementById('data').textContent);
+    const body = document.getElementById('body');
+    const q = document.getElementById('q');
+    const fStability = document.getElementById('stability');
+    const fModel = document.getElementById('model');
+    const countsEl = document.getElementById('counts');
+
+    function esc(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function chips(arr) { return (arr || []).map(x => `<span class="tool-chip">${esc(x)}</span>`).join(''); }
+
+    function render() {
+      const ql = q.value.toLowerCase().trim();
+      const st = fStability.value;
+      const md = fModel.value;
+      const rows = data.filter(r => {
+        if (st && r.stability !== st) return false;
+        if (md && r.model !== md) return false;
+        if (ql) {
+          const hay = (r.name + ' ' + r.description).toLowerCase();
+          if (!hay.includes(ql)) return false;
+        }
+        return true;
+      });
+      countsEl.textContent = rows.length + ' of ' + data.length + ' skills';
+      body.innerHTML = rows.map((r, i) => `
+        <tr class="row" data-i="${i}">
+          <td><code>${esc(r.name)}</code></td>
+          <td><span class="badge ${r.stability}">${r.stability}</span></td>
+          <td>${esc(r.model)}</td>
+          <td class="desc">${esc(r.description.length > 160 ? r.description.slice(0, 160) + '…' : r.description)}</td>
+          <td>${chips(r.consumes_from)}</td>
+        </tr>
+        <tr class="detail" id="d${i}">
+          <td colspan="5">
+            <dl class="detail-grid">
+              <dt>Path</dt><dd><code>${esc(r.path)}</code></dd>
+              <dt>Version</dt><dd>${esc(r.version)}</dd>
+              <dt>Est. tokens</dt><dd>${esc(r.estimated_tokens)}</dd>
+              <dt>Tools</dt><dd>${chips(r.tools)}</dd>
+              <dt>uses_tools</dt><dd>${chips(r.uses_tools)}</dd>
+              <dt>consumes_from</dt><dd>${chips(r.consumes_from)}</dd>
+              <dt>produces_for</dt><dd>${chips(r.produces_for)}</dd>
+              <dt>Description</dt><dd>${esc(r.description)}</dd>
+            </dl>
+          </td>
+        </tr>
+      `).join('');
+      body.querySelectorAll('tr.row').forEach(row => {
+        row.addEventListener('click', () => {
+          const i = row.dataset.i;
+          document.getElementById('d' + i).classList.toggle('open');
+        });
+      });
+    }
+    q.addEventListener('input', render);
+    fStability.addEventListener('change', render);
+    fModel.addEventListener('change', render);
+    render();
+
+    if (window.mermaid) {
+      window.mermaid.initialize({ startOnLoad: true, theme: 'default', securityLevel: 'loose' });
+    }
+  </script>
+</body>
+</html>
