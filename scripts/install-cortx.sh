@@ -81,9 +81,9 @@ mkdir -p "$bindir"
 mv -f "${tmp}/cortx" "${bindir}/cortx"
 printf '✓ cortx installed at %s/cortx\n' "$bindir"
 
+# shellcheck disable=SC2016  # the literal $PATH below is intentional — instructional text.
 case ":${PATH}:" in
   *":${bindir}:"*) : ;;
-  # shellcheck disable=SC2016  # literal $PATH is intentional — it's instructional text.
   *) printf '  NOTE: %s is not on your PATH. Add it:\n    export PATH="%s:$PATH"\n' "$bindir" "$bindir" ;;
 esac
 

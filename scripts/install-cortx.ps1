@@ -65,6 +65,7 @@ try {
     }
     Write-Host "✓ cortx installed at $installDir\cortx.exe"
     Write-Host "  Durable memory: run ``cortx graph-server`` (keep running). Verify: ``cortx memory health``."
+    Write-Host "  Update later:   cortx self-update --apply"
 }
 finally {
     Remove-Item -Recurse -Force $tmp -ErrorAction SilentlyContinue

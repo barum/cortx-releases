@@ -1,0 +1,18 @@
+PackageIdentifier: Monarizations.CorTxOS
+PackageVersion: 6.16.0
+PackageLocale: en-US
+Publisher: Monarizations Labs
+PublisherUrl: https://cortxos.dev
+PackageName: CorTxOS
+PackageUrl: https://cortxos.dev
+License: Proprietary
+Copyright: Copyright (c) 2026 Monarizations Labs
+ShortDescription: CorTxOS single-binary agentic skill runtime (run/dispatch/audit/memory/mcp/gateway).
+Moniker: cortx
+Tags:
+  - cli
+  - ai
+  - agent
+  - developer-tools
+ManifestType: defaultLocale
+ManifestVersion: 1.6.0

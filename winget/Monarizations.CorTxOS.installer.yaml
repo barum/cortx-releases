@@ -1,0 +1,16 @@
+# winget installer manifest. The release workflow regenerates this per tag,
+# substituting PackageVersion, the URL version, and the real x86_64 zip digest.
+# Distribution is the portable `cortx.exe` inside the published Windows zip.
+PackageIdentifier: Monarizations.CorTxOS
+PackageVersion: 6.16.0
+InstallerType: zip
+NestedInstallerType: portable
+NestedInstallerFiles:
+  - RelativeFilePath: cortx.exe
+    PortableCommandAlias: cortx
+Installers:
+  - Architecture: x64
+    InstallerUrl: https://github.com/barum/cortx-releases/releases/download/v6.16.0/cortx-6.16.0-x86_64-pc-windows-msvc.zip
+    InstallerSha256: 611b431e3eb8bdf612e5d2ff69bfafa249d606d078bf2d652b6e0b6ac25192d6
+ManifestType: installer
+ManifestVersion: 1.6.0

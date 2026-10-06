@@ -1,12 +1,12 @@
 {
-    "version": "6.13.0",
+    "version": "6.16.0",
     "description": "CorTxOS single-binary agentic skill runtime (run/dispatch/audit/memory/mcp/gateway).",
     "homepage": "https://cortxos.dev",
     "license": "Proprietary",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/barum/cortx-releases/releases/download/v6.13.0/cortx-6.13.0-x86_64-pc-windows-msvc.zip",
-            "hash": "__SHA256_X86_64_PC_WINDOWS_MSVC__",
+            "url": "https://github.com/barum/cortx-releases/releases/download/v6.16.0/cortx-6.16.0-x86_64-pc-windows-msvc.zip",
+            "hash": "611b431e3eb8bdf612e5d2ff69bfafa249d606d078bf2d652b6e0b6ac25192d6",
             "bin": "cortx.exe"
         }
     },
