@@ -1,0 +1,41 @@
+{
+  "currency": "USD",
+  "source_of_truth": "packages/cortx-web/data/pricing-catalogue.ts (GAP-PRC009 T8) + cortx_license::FREE_TIER_LIMITS (GAP-PRC0002)",
+  "tiers": [
+    {
+      "id": "free",
+      "name": "Free",
+      "price_monthly_usd": 0,
+      "price_label": "$0",
+      "interval": "month",
+      "seats_included": 1,
+      "stable_skills": 64,
+      "private_registry": 0,
+      "replay": 0
+    },
+    {
+      "id": "team",
+      "name": "Team",
+      "price_monthly_usd": 49,
+      "price_label": "$49",
+      "interval": "month",
+      "seats_included": 5
+    },
+    {
+      "id": "business",
+      "name": "Business",
+      "price_monthly_usd": 199,
+      "price_label": "$199",
+      "interval": "month",
+      "seats_included": 25
+    },
+    {
+      "id": "enterprise",
+      "name": "Enterprise",
+      "price_monthly_usd": null,
+      "price_label": "Contact us",
+      "interval": "month",
+      "seats_included": null
+    }
+  ]
+}
