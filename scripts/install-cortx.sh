@@ -65,6 +65,23 @@ actual="$(printf '%s' "$actual" | tr '[:upper:]' '[:lower:]')"
 [ "$actual" = "$expected" ] || err "SHA-256 mismatch (expected $expected, got $actual). Refusing to install."
 printf '✓ SHA-256 verified.\n'
 
+# GAP-SRF0063 / GAP-GOV0021: require the Sigstore sidecar and refuse when the
+# signed messageDigest does not cover the downloaded bytes.
+bundle_url="${url}.sigstore.json"
+curl -fsSL "$bundle_url" -o "${tmp}/${tarball}.sigstore.json" \
+  || err "Sigstore bundle download failed: $bundle_url"
+python3 - "$tmp/$tarball" "$tmp/${tarball}.sigstore.json" <<'PY' || err "Sigstore messageDigest mismatch — refusing to install"
+import json, hashlib, sys, base64, pathlib
+asset, bundle = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2])
+j = json.loads(bundle.read_text())
+digest_b64 = j["messageSignature"]["messageDigest"]["digest"]
+expected = base64.b64decode(digest_b64).hex()
+actual = hashlib.sha256(asset.read_bytes()).hexdigest()
+if expected != actual:
+    raise SystemExit(f"digest mismatch: bundle={expected} asset={actual}")
+print(f"✓ Sigstore messageDigest verified ({actual})")
+PY
+
 tar -xzf "${tmp}/${tarball}" -C "$tmp"
 [ -f "${tmp}/cortx" ] || err "archive did not contain a 'cortx' binary"
 chmod +x "${tmp}/cortx"

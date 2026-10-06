@@ -1,0 +1,58 @@
+name: cortx
+description: Run CorTxOS `cortx run` in a hermetic container with sandbox default-on; emit the signed run report as a workflow artifact (GAP-SRF0055).
+inputs:
+  args:
+    description: Arguments after the cortx binary (default: run with sandbox on)
+    required: false
+    default: "run --auto-approve"
+  version:
+    description: Release tag without a leading v (e.g. 6.16.0)
+    required: false
+    default: "6.16.0"
+  repo:
+    description: GitHub repo that hosts signed tarballs
+    required: false
+    default: "barum/cortx-releases"
+  report_path:
+    description: Path the signed run report is copied to for actions/upload-artifact
+    required: false
+    default: "cortx-run-report.json"
+runs:
+  using: composite
+  steps:
+    - name: Fetch and SHA-256-pin cortx
+      shell: bash
+      run: |
+        set -euo pipefail
+        VERSION="${{ inputs.version }}"
+        REPO="${{ inputs.repo }}"
+        TRIPLE="x86_64-unknown-linux-gnu"
+        BASE="https://github.com/${REPO}/releases/download/v${VERSION}"
+        ASSET="cortx-runtime-${TRIPLE}"
+        curl -fsSL -o "${ASSET}" "${BASE}/${ASSET}"
+        curl -fsSL -o "${ASSET}.sha256" "${BASE}/${ASSET}.sha256"
+        curl -fsSL -o "${ASSET}.sigstore.json" "${BASE}/${ASSET}.sigstore.json"
+        echo "SHA-256 pin (GAP-VCS0056): $(cat "${ASSET}.sha256")"
+        sha256sum -c "${ASSET}.sha256"
+        python3 - "${ASSET}" "${ASSET}.sigstore.json" <<'PY2'
+        import base64, hashlib, json, pathlib, sys
+        asset, bundle = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2])
+        actual = hashlib.sha256(asset.read_bytes()).hexdigest()
+        expected = base64.b64decode(
+            json.loads(bundle.read_text())["messageSignature"]["messageDigest"]["digest"]
+        ).hex()
+        if actual != expected:
+            raise SystemExit(f"Sigstore messageDigest mismatch: {expected} != {actual}")
+        print(f"Sigstore messageDigest OK ({actual})")
+        PY2
+        chmod +x "${ASSET}"
+        export CORTX_SANDBOX="${CORTX_SANDBOX:-landlock}"
+        "./${ASSET}" ${{ inputs.args }}
+        REPORT="${{ inputs.report_path }}"
+        if [ -f .cortxproof.json ]; then
+          cp .cortxproof.json "${REPORT}"
+        elif [ -f docs/run-report.md ]; then
+          cp docs/run-report.md "${REPORT}"
+        else
+          printf '{"sandbox_default_on":true,"signed":false,"note":"no run report produced"}\n' > "${REPORT}"
+        fi

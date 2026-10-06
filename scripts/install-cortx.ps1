@@ -52,6 +52,22 @@ try {
     }
     Write-Host "✓ SHA-256 verified."
 
+    # GAP-SRF0059 — require Sigstore sidecar; refuse when messageDigest mismatches.
+    $bundleUrl = "$zipUrl.sigstore.json"
+    $bundlePath = "$zipPath.sigstore.json"
+    Invoke-WebRequest -Uri $bundleUrl -OutFile $bundlePath -UseBasicParsing
+    $bundle = Get-Content -Raw -Path $bundlePath | ConvertFrom-Json
+    $digestB64 = $bundle.messageSignature.messageDigest.digest
+    if (-not $digestB64) {
+        throw "cortx: Sigstore bundle missing messageDigest — refusing to install."
+    }
+    $digestBytes = [Convert]::FromBase64String($digestB64)
+    $expectedDigest = ([BitConverter]::ToString($digestBytes) -replace '-', '').ToLower()
+    if ($expectedDigest -ne $actual) {
+        throw "cortx: Sigstore messageDigest mismatch (bundle=$expectedDigest, asset=$actual). Refusing to install."
+    }
+    Write-Host "✓ Sigstore messageDigest verified ($actual)."
+
     Expand-Archive -Path $zipPath -DestinationPath $tmp -Force
     $installDir = Join-Path $env:LOCALAPPDATA "Programs\cortx"
     New-Item -ItemType Directory -Path $installDir -Force | Out-Null
